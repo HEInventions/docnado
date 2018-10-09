@@ -4,6 +4,8 @@ A rapid documentation tool to blow you away.
 
 Docnado makes it easy to start and maintain a Markdown documentation project.  Store your own data your own way.
 
+[![PyPI version](https://badge.fury.io/py/docnado.svg)](https://badge.fury.io/py/docnado)
+
 # Basic Features
 
 Docnado renders an adapted Markdown to provide:
