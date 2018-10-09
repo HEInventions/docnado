@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% block title %}
+    {% endblock %}
+
+    <script src="{{ url_for('static', filename='lib/jquery-3.2.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/bootstrap-4.0.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/highlight-9.12.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/bootbox-4.4.0.min.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/highlightjs-9.12.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap-4.0.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome-4.7.0.min.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='default.css') }}">
+
+    {% block head %}
+    {% endblock %}
+
+</head>
+    <body>
+
+        <!-- Header Bar -->
+        <header class="navbar navbar-light page-headbar">
+            <button class="navbar-toggler page-togglesidebar" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="/">
+                <!-- Project Name -->
+                {% if project_logo %}
+                <img src="{{ project_logo }}" style="max-height:30px;"></img>
+                {% endif %}
+            </a>
+            <nav class="nav">
+                <a class="nav-link" href="#" onclick="window.print();">Print</a>
+                {% if pdf_enabled %}
+                <a class="nav-link" href="{{ url_for('wiki_pdf', page=current_page) }}" target="_blank">PDF</a>
+                {% endif %}
+            </nav>
+        </header>
+
+        <!-- Side Bar -->
+        <aside class="page-sidebar">
+
+            {% block sidebar_head %}
+            {% endblock %}
+
+            {# Sidebar Construction.
+
+                This is a bit complicated...
+
+                We have a `UserDict` of nested levels: { a: { b: { c: {} }}} called `nav_menu`.
+
+                We loop through it recursively; making a file LI if the `link` attribute on the
+                dictionary is defined.  If it is not defined, we are not a leaf and need to
+                render the menu as a ul.
+
+                The dropdown list uses `checkbox` elements to determine which bit is open and closed.
+
+                The following expression:
+                    `nav is defined and nav[0].split('>')[-1] == key`
+                returns TRUE if the leaf selected is also the page being rendered and
+                the document has a `nav` meta-data set.
+
+                The following selection:
+                    `{% if nav is defined and key not in nav[0] %}checked{% endif %}`
+                adds the `checked` property to the checkbox if if (A) the document has
+                a `nav` metadata and (B) the node name is also contained in the nav.
+
+                NOTE: The above selection is buggy because it could lead to submenus with the
+                same names being opened when they should not be.  However, for now, it will do.
+
+                TODO: Write a Jinja filter that does it properly.
+                TODO: Generate a loop-uniqe ID to replace `#nav-{{ key }}`.
+            #}
+
+            <ul class="tree-nav tree-root">
+
+                {%- for key, value in nav_menu.items() recursive %}
+
+                {% if value.link is defined %}
+                <li class="tree-leaf">
+                    {% if nav is defined and nav[0].split('>')[-1] == key %}
+                        <i class="fa fa-circle" aria-hidden="true"></i>
+                    {% else %}
+                        <i class="fa fa-circle-thin" aria-hidden="true"></i>
+                    {% endif %}
+                    <a href="{{ url_for('wiki', page=value.link) | url_unquote }}"><span>{{ key }}</span></a>
+                </li>
+                {% else %}
+                <li>
+                    <input type="checkbox" {% if nav is defined and key not in nav[0] %}checked{% endif %} id="#nav-{{ key }}">
+                    <label for="#nav-{{ key }}">
+                        <i class="tree-icon fa fa-fw fa-chevron-down"></i>
+                        <span>{{ key }}</span>
+                    </label>
+                    <ul class="tree-nav">{{ loop(value.items())}}</ul>
+                </li>
+                {% endif %}
+
+                {%- endfor %}
+            </ul>
+
+            {% block sidebar_foot %}
+            {% endblock %}
+        </aside>
+
+        <!-- MAIN PAGE CONTENT -->
+        <section class="page-main">
+            <div class="page-content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </section>
+    </body>
+
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+
+        // Sidebar functionality.
+        $('.page-togglesidebar').click(function(){
+            $('body').toggleClass('page-sidebar-closed')
+        });
+
+        // Apply code highlighting.
+        $('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+        });
+
+        // Apply CSS to all tables.
+        $('.page-md table').addClass('table thead-light table-hover');
+
+        // Set images to lightbox.
+        $('.page-md img').on('click', function(event) {
+            var imgsrc = $(this).attr('src');
+            bootbox.alert({
+                message: '<img src="'+imgsrc+'" style="width:100%; height:auto;"></img>',
+                backdrop: true,
+                closeButton: false,
+                size: 'large'
+            });
+        });
+    });
+    </script>
+
+
+    {% block script %}
+    {% endblock %}
+
+</html>

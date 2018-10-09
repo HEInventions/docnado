@@ -1,0 +1,364 @@
+/**
+ * Docnado template default styles.
+ *
+ */
+
+// // Core.
+// @mixin nopointerevents() {
+//     pointer-events: none;
+//     -webkit-touch-callout: none; // iOS Safari
+//       -webkit-user-select: none; // Safari
+//        -khtml-user-select: none; // Konqueror HTML
+//          -moz-user-select: none; // Firefox
+//           -ms-user-select: none; // Internet Explorer/Edge
+//               user-select: none; // Non-prefixed version, currently supported by Chrome and Opera
+// }
+
+// Page structure is set out as follows:
+    // page-headbar             -- top bar
+    // page-sidebar             -- left bar
+    // page-main                -- main content with margin for left bar
+        // page-content         -- margin around content
+            // page-header      -- document heading
+            // page-md          -- document body
+
+body {
+
+    // font-family: Roboto, sans-serif;
+
+    // Navbar.
+    header.page-headbar {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        height: 4.5rem;
+        z-index: 1;
+        box-shadow: 0 1px 1px 0 rgba(116, 129, 141, 0.1);
+    }
+
+    // Sidebar and main page content.
+    $sidebar_size: 260px;
+
+    .page-sidebar {
+        width: 260px;
+        position: fixed;
+        bottom: 0px;
+        top: 4.5rem;
+        background-color: #f5f7f9;
+        padding-top: 20px;
+        transition: margin-left 0.25s;
+        overflow-y: auto;
+    }
+
+    .page-main {
+        margin-left: $sidebar_size;
+        display: flex;
+        transition: margin-left 0.25s;
+
+        >.page-content {
+            margin: 44px 88px 0px 88px;
+            flex: 1 1 auto;
+        }
+    }
+
+    // When the body has the `page-sidebar-closed` class added,
+    // close the sidebar.
+    &.page-sidebar-closed .page-sidebar { margin-left: -$sidebar_size; }
+    &.page-sidebar-closed .page-main { margin-left: 0px; }
+}
+
+
+
+.tree-root {
+    margin: 0; padding: 0; padding-left:25px; user-select: none;
+    span { font-weight: 400; font-size: 16px; }
+}
+
+.tree-nav {
+    list-style: none;
+
+    ul { padding-left: 24px; }
+    input[type=checkbox] { display:none; }
+    input:checked ~ ul { display:none; }
+
+    li {
+        margin-top: 3px;
+        label { width: 100%; margin:0; }
+        label span { padding-left:6px; }
+    }
+    li.tree-leaf span { margin-left: 6px; }
+    input ~ label>.tree-icon { transform: rotate(0deg); transition: transform .1s; font-size: 10px; vertical-align: top; margin-top: 7px; }
+    input:checked ~ label>.tree-icon   { transform: rotate(-90deg); }
+}
+
+$content-width: 750px;
+
+.page-main > .page-content p, ul, ol, h1, h2, h3, h4, h5, h6, dl, pre, img {
+    max-width: $content-width;
+}
+// The document header before the markdown body.
+.page-header {
+    $header-bar-colour: #BA0028;
+    padding: 0px 0em 1px 1em; border-left: 0.25em solid $header-bar-colour;
+
+    .version { border-radius: 2px; height: 30px; color: #fff; background-color: #aaa;
+            display: inline-block; line-height: 26px; padding: 0 10px 0px 10px;
+            font-weight: 600; font-size: 0.9em; }
+    .version:hover { transform: scale(1.1); }
+    .avatar { border-radius: 2px; width: 30px; height: 30px; }
+    .avatar:hover { transform: scale(1.1); }
+    small { font-size: 12px; font-weight: 400; color: gray; }
+}
+
+
+// The document markdown.
+.page-md {
+
+    // Title header.
+    h1 {  border-top: 1px solid #f0f0f0; padding-top: 42px; padding-bottom: 10px; }
+
+    // Paragraph styling.
+     p {
+         text-align: justify;
+
+         @mixin callout {
+             display: block;
+             width: 100%;
+             margin: 32px 0px;
+             padding: 24px 24px 24px 50px;
+             border-left: 4px solid;
+             border-radius: 3px;
+         }
+
+         @mixin callout-icon {
+             border-radius: 50%;
+             margin-left: -40px;
+             margin-top: -4px;
+             float: left;
+             text-align: center;
+             font-size: 20px; width: 30px; height: 30px; line-height: 30px;
+             font-weight: bold;
+             border: 1px solid;
+         }
+
+         // Info callout.
+         $info_text: #3884ff;
+         $info_background: #f5f7f9;
+         &.info { @include callout(); background-color: $info_background; border-left-color: $info_text; }
+         &.info:before { @include callout-icon(); border-color: $info_text; color: $info_text; content: "i"; line-height: 26px; }
+
+         // Tip callout.
+         $tip_text: #5cb85c;
+         $tip_background: #f5f7f9;
+         &.tip { @include callout(); background-color: $tip_background; border-left-color: $tip_text; }
+         &.tip:before { @include callout-icon(); border: none; color: $tip_text; content: "Tip"; }
+
+         // Warning callout.
+         $warning_text: #ffc838;
+         $warning_background: #fffef6;
+         &.warning { @include callout(); background-color: $warning_background; border-left-color: $warning_text; }
+         &.warning:before { @include callout-icon(); border-color: $warning_text; color: $warning_text; content: "!"; line-height: 26px; }
+
+         // danger callout.
+         $danger_text: #ffffff;
+         $danger_background: #da302b;
+         &.danger { @include callout(); background-color: $danger_background; border-left-color:#ff0700; color: $danger_text; font-weight: bold; }
+         &.danger:before { @include callout-icon(); border-color: $danger_text; color: $danger_text; content: "!!"; line-height: 26px; }
+     }
+
+     // Images, Video, and YouTube elements.
+     @mixin content_border() {
+         max-width: 100%; max-width: 100%; max-height: 250mm; margin: 5px;
+         border: 1px solid #d9d9d9; border-radius: 2px; padding: 5px;
+     }
+     $size_small: 30%;
+     $size_medium: 60%;
+     $size_large: 100%;
+
+     p {
+         // Images
+         >img { @include content_border(); }
+         >img.noborder { border: none; padding: inherit;}
+         >img.center { display: block; margin-left: auto; margin-right: auto; }
+         >img.icon   { max-width: 30px; }
+         >img.small  { max-width: $size_small; }
+         >img.medium { max-width: $size_medium }
+         >img.large  { max-width: $size_large; }
+
+         // HTML5 Video.
+         video { @include content_border(); }
+         &.small>video { max-width: $size_small; }
+         &.medium>video { max-width: $size_medium; }
+
+         // Youtube.
+         &.small iframe.video { width: 300px; height: 210px; }
+         &.medium iframe.video { width: 560px; height: 315px; }
+         &.large iframe.video { width: $content-width; height: 421px; }
+     }
+
+     video { @include content_border(); }
+     video.small { max-width: $size_small; }
+     video.medium { max-width: $size_medium; }
+     video.large { max-width: $size_large; }
+
+     iframe.video { @include content_border(); width: $content-width; height: 421px; }
+     iframe.video.small { width: 300px; height: 210px; }
+     iframe.video.medium { width: 560px; height: 315px; }
+     iframe.video.large { width: $content-width; height: 421px; }
+
+
+     @mixin pdf-aspect-ratio($width, $height) {
+       position: relative;
+       &:before {
+         display: block;
+         content: "";
+         width: 100%;
+         padding-top: ($height / $width) * 100%;
+       }
+       > .pdf-embed {
+         position: absolute;
+         top: 0;
+         left: 0;
+         right: 0;
+         bottom: 0;
+       }
+     }
+     aside.pdf-embed-wrapper { @include content_border(); @include pdf-aspect-ratio(1.0, 1.1412); }
+     aside.pdf-embed-wrapper.landscape { @include content_border(); @include pdf-aspect-ratio(1.4142, 1.0); }
+
+     // Blockquotes.
+     blockquote {
+         padding: 0 1em;
+         color: #6a737d;
+         border-left: 0.25em solid #dfe2e5;
+         text-align: justify;
+     }
+
+     // Normal list.
+     li {
+         margin-bottom: 3px;
+
+         >img { display: block; }
+         >video { display: block; }
+         >aside.pdf-embed-wrapper { display: block; }
+     }
+
+     // [ ] Checkbox list.
+     ul.checklist {
+
+         display: -webkit-box;
+         display: -ms-flexbox;
+         display: flex;
+         -webkit-box-orient: vertical;
+         -webkit-box-direction: normal;
+         -ms-flex-direction: column;
+         flex-direction: column;
+
+         $side-padding: 40px;
+         padding-left: $side-padding;
+         margin-bottom: $side-padding;
+         >li {
+            position: relative;
+            display: block;
+            padding: .75rem 1.25rem;
+            background-color: #fff;
+            margin-bottom: -1px;
+            >input[type=checkbox] {
+                width: 1.5em;
+                height: 1.5em;
+                position: absolute;
+                left: -$side-padding/2;
+            }
+         }
+     }
+
+     // Numbered list.
+     ol {
+         $side-padding: 40px;
+         list-style-type: none;
+         margin-left: $side-padding/2;
+         counter-reset: li-counter;
+        > li{
+            position: relative;
+            margin-bottom: $side-padding/2;
+            padding-left: 0.5em;
+            border-left: 1px solid #d9d9d9;
+        }
+        > li:before {
+            position: absolute;
+            top: 0;
+            left: -$side-padding;
+            font-weight: bold;
+            content: counter(li-counter);
+            counter-increment: li-counter;
+        }
+     }
+
+     // Tables.
+     table {
+        max-width: $content-width;
+        &.full-width { max-width: 100%; }      // for csv includes...
+
+        font-size: 0.8em;
+        background: #88888808;
+
+        img, video {
+            display: block;
+            &.small { max-width: $size_small; }
+            &.medium { max-width: $size_medium; }
+            &.large { max-width: $size_large; }
+        }
+     }
+
+     // Definition lists.
+     dl {
+         display: flex; -ms-flex-wrap: wrap; flex-wrap: wrap;
+         dt { flex: 0 0 25%; max-width: 25%; }
+         dd { flex: 0 0 75%; max-width: 75%; }
+     }
+
+     // Download card.
+     .download-card { flex-flow: row nowrap; max-width: $content-width; }
+     .download-card img { max-height: 100px; max-width: 200px; }
+     .download-card .download-card-header { display: inline; }
+     .download-card .download-card-body { padding: 5px 15px 5px 15px; font-size: 14px; }
+     .download-card .download-card-body>a { display: block; font-size: 20px; }
+     .download-card .download-card-body>a>i { padding-right: 10px; }
+     .download-card .download-card-body>span { display: block; }
+
+}
+
+/** PRINT CSS */
+@media print {
+
+    @page {
+        size: A4;
+        /* margin: 2cm; */
+        /* @bottom-right {
+         content: counter(page) " of " counter(pages);
+        } */
+    }
+
+    /** Print with the correct background colours on all elements */
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+
+    /** Hide the NAV bar */
+    body .page-sidebar { margin-left: -260px!important; }
+    body .page-main { margin-left: 0px!important; }
+
+    /** Define page break behaviour */
+    table, p, pre, blockquote {
+        page-break-inside: avoid;
+    }
+    ol, ul, img, video, table {
+        page-break-inside: avoid;
+    }
+    h1, h2, h3, h4, h5, h6 {
+       page-break-after: avoid;
+    }
+
+    .page-md a[href^=http]:after {
+       content:" <" attr(href) "> ";
+    }
+}

@@ -1,0 +1,39 @@
+image: python:3.6
+
+stages:
+  - staticcheck
+  - documentationcheck
+
+staticcheck:
+  stage: staticcheck
+  before_script:
+    - pip install -U flake8
+  script:
+    - flake8 .
+
+prosecheck:
+  stage: documentationcheck
+  before_script:
+    - pip install -U pip setuptools
+    - pip install -Ur requirements.txt
+    - pip install proselint
+    - export XDG_CONFIG_HOME=.
+  script:
+    - proselint docnado/docs
+    - proselint README.md
+
+link-check:
+  stage: documentationcheck
+  before_script:
+    - pip install -U pip setuptools
+    - pip install -Ur requirements.txt
+  script:
+    - python3 docnado/docnado.py --find-broken-links
+
+unused-asset-check:
+  stage: documentationcheck
+  before_script:
+    - pip install -U pip setuptools
+    - pip install -Ur requirements.txt
+  script:
+    - python3 docnado/docnado.py --find-orphans

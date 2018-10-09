@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}
+    <title>{{ title | first }}</title>
+{% endblock %}
+
+
+{% block head %}
+<style type="text/css">
+
+    .page-content {
+        margin: 44px 88px 44px 88px!important;
+    }
+
+    .page-content section { border: 2px solid black; }
+    .page-content section>table { width: 100%; }
+
+    .page-content section>table>thead {
+        background-color: darkgray;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .page-content section>table td {
+        border: 1px solid gray;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+    .page-content section.heading>div {
+        display: flex;
+        align-items: center;
+        justify-content: left;
+    }
+    
+    .page-content section.heading>div>h1 {
+        width:100%;
+        text-align: right;
+    }
+
+    .page-content section>div.part-progress-bar {
+        padding-right: 0px;
+        padding-left: 0px;
+    }
+    .page-content section>div.part-progress-bar .progress {
+        border-radius: 0px;
+        height: 100%;
+    }
+
+    .page-content .page-md {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    .page-main > .page-content p, ul, ol, h1, h2, h3, h4, h5, h6, dl, pre, img {
+        max-width: 100%;
+    }
+
+    .text-strong {
+        text-transform: uppercase;
+    }
+
+    /** PRINT CSS */
+    @media print {
+        .page-main { margin: 0; padding:0; }
+        .page-content { margin: 0!important;  }
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container">
+
+    <section class="row heading">
+        <div class="col-3 part-logo">
+            {% if project_logo %}
+            <img src="{{ project_logo }}" style="max-height:30px;"></img>
+            {% endif %}
+        </div>
+        <div class="col-9">
+            <h1>{{ title | first }}</h1>
+        </div>
+    </section>
+
+    <section class="row">
+
+        <table>
+            <thead>
+                <td>Part &#8470;</td>
+                <td>Version</td>
+                <td>Description</td>
+                {% for item in facts %}
+                    {% set name, value = item.split('=') %}
+                    <td>{{ name }}</td>
+                {% endfor %}
+            </thead>
+            <tr>
+                <td>{{ pbs | first }}</td>
+                <td>V{{ version | first }}</td>
+                <td>{{ desc | first }}</td>
+                {% for item in facts %}
+                    {% set name, value = item.split('=') %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+    </section>
+
+
+    {% if percent and percent != ['100'] %}
+        <section class="row">
+            <div class="col-sm-2 text-strong">Progress {{ percent | first }}%</div>
+            <div class="col-sm-10 part-progress-bar">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped " role="progressbar" style="width:  {{ percent | first }}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                  </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="row">
+        <div class="col-sm-12 page-md">{{ content }}</div>
+    </section>
+
+    <section class="row">
+        <table>
+            {% for ref in reference %}
+            <tr>
+                <td class="text-strong">Part Reference #{{ loop.index }}</td>
+                <td><a href="{{ ref }}">{{ ref }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
+
+    <section class="row">
+        <table>
+            <thead>
+                <td>Version</td>
+                <td>Date</td>
+                <td>Author</td>
+                <td>Description</td>
+            </thead>
+            {% for version in history | reverse %}
+                {% set ver, date, email, desc = version.split(';') %}
+            <tr>
+                <td>V{{ ver }}</td>
+                <td>{{ date }}</td>
+                <td>{{ email }}</td>
+                <td>{{ desc }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </section>
+
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+    });
+
+</script>
+{% endblock %}

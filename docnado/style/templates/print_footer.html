@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style type="text/css">
+        html, body { padding: 0; margin: 0; font-family: Roboto, sans-serif; font-size: 0.8em; color: #888; }
+        table { width: 100%; line-height: 2em; }
+        .left {  text-align: left; }
+        .middle { text-align: center; }
+        .right { text-align: right; }
+    </style>
+
+    <script>
+        /** Insert document location values into the DOM by searching for classes.
+         * http://madalgo.au.dk/~jakobt/wkhtmltoxdoc/wkhtmltopdf-0.9.9-doc.html
+         */
+        function init() {
+
+            // Get a DOM parameter from its name.
+            function getParameterByName(name) {
+                var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+                return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+            }
+
+            // Insert the textContent of named DOMClasses.
+            function substitute(name) {
+                var value = getParameterByName(name);
+                var elements = document.getElementsByClassName(name);
+                for (var i = 0; elements && i < elements.length; i++) {
+                    elements[i].textContent = value;
+                }
+            }
+            VARS = ['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
+            VARS.forEach(substitute);
+        }
+    </script>
+</head>
+
+<body onload="init()">
+        <table>
+            <tr>
+                <td class="left"></td>
+                <td class="middle"></td>
+                <td class="right">
+                    <span class="page"></span> of <span class="topage"></span>
+                </td>
+            </tr>
+        </table>
+</body>
+</html>

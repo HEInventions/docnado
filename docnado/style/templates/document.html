@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}
+    <title>{{ title | first }}</title>
+{% endblock %}
+
+
+{% block content %}
+
+    {% if title is defined %}
+    <div class="page-header">
+        <h1 class="display-4">{{ title | first }} </h1>
+        <p class="lead">{{ desc | first }}</p>
+        <p>
+            <span class="version">V{{ version | first }}</span>
+            {% for email in authors %}
+            <img src="{{ email | gravatar }}" class="avatar" alt="{{ email }}" title="{{ email }}" />
+            {% endfor %}
+            <small>last updated <span>{{ date | first | timesince }}</span> on <span>{{ date | first }}</span></small>
+        </p>
+
+        {% if percent and percent != ['100'] %}
+            <hr class="my-4">
+            <p>This document is approximately {{ percent | first }}% complete.
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:  {{ percent | first }}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                </p>
+        {% endif %}
+    </div>
+    <br/>
+    {% endif %}
+
+    <div class="page-md">
+        {{ content }}
+    </div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        // // Apply CSS specific to a table in a *parts* heading.
+        // $('.page-md #parts + table')
+        //     .addClass('parts')
+        // //     .addClass('table thead-light table-hover')
+        // //     //.css('position', 'absolute')
+        //     //.css('width', '60%');
+    });
+
+</script>
+{% endblock %}
