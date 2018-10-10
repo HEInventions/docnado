@@ -1062,6 +1062,7 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
+        if observer:
             observer.stop()
             observer.join()
 
