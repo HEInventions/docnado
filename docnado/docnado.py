@@ -1060,7 +1060,8 @@ def main():
     except OSError:
         print(f'Error initialising server. Port {PORT_NUMBER} is already in use.\nTry "--port"')
     except KeyboardInterrupt:
-        if observer:
+        pass
+    finally:
             observer.stop()
             observer.join()
 
