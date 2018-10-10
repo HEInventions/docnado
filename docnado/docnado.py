@@ -1057,7 +1057,11 @@ def main():
     # Run the server.
     try:
         app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files)
+    except OSError:
+        print(f'Error initialising server. Port {PORT_NUMBER} is already in use.\nTry "--port"')
     except KeyboardInterrupt:
+        pass
+    finally:
         if observer:
             observer.stop()
             observer.join()
