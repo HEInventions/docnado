@@ -517,16 +517,40 @@ def configure_flask(app, root_dir):
         return response
 
 
-def generate_static_pdf(app, root_dir, output_dir):
+def generate_static_pdf(app, root_dir, output_dir, nav_filter=None):
     """ Generate a static PDF directory for the documentation in `root_dir`
     into `output_dir`.
     """
     global PORT_NUMBER
-    # All the document URLs.
-    markdown_docs_urls = [file.replace(f'{root_dir}{os.path.sep}', 'pdf/').replace('\\', '/')
-                          for file in glob.iglob(f'{root_dir}/**/*', recursive=True)
-                          if os.path.isfile(file) and file.endswith('.md')]
+    # All the markdown document paths:
+    markdown_paths = [d for d in glob.iglob(f'{root_dir}/**/*', recursive=True) if os.path.isfile(d) and d.endswith('.md')]
 
+    # Filter the documents without the required nav structure, if set.
+    if nav_filter is not None:
+        temp = []
+        for path in markdown_paths:
+            # FOR SOME REASON THIS FILE CAUSES BUGS AND I CAN'T WORK OUT WHY
+            if path == '/home/alexander/docnado/docnado/docs/documents/tables.md':
+                continue
+            with open(path) as md_data:
+                raw = md_data.read()
+                if has_nav(raw.lower()):
+                    md = markdown.Markdown(extensions=mdextensions)
+                    print(path)
+                    Markup(md.convert(raw))
+                    # Fetch the nav defined in the metadata.
+                    nav = md.Meta.get('nav', None)[0]
+                    if nav.startswith(nav_filter):
+                        temp.append(path) 
+        markdown_paths = temp
+
+
+    markdown_docs_urls = [
+            filename.replace(f'{root_dir}{os.path.sep}', 'pdf/').replace('\\', '/')
+            for filename
+            in markdown_paths
+            ]
+    
     # Generate URl to file pairs.
     pairs = [(f'http://localhost:{PORT_NUMBER}/{url}',
              f'{os.path.join(output_dir, *os.path.split(url))}.pdf')
@@ -889,6 +913,10 @@ def main():
                         help='Generate static PDFs from the server and output to the \
                         specified directory.')
 
+    parser.add_argument('--nav', action='store', dest='nav_filter',
+                        default = None,
+                        help='Define a subset of documents to convert to pdf.')
+
     parser.add_argument('--new', action="store_true", dest='new_project',
                         default=False,
                         help='Copy the `docs` and `styles` folder into the working directory \
@@ -1026,7 +1054,12 @@ def main():
 
         def gen_pdfs():
             time.sleep(2)
-            generate_static_pdf(app, dir_documents, output_dir=os.path.join(os.getcwd(), args.pdf_output_dir))
+            generate_static_pdf(
+                    app,
+                    dir_documents,
+                    os.path.join(os.getcwd(), args.pdf_output_dir),
+                    args.nav_filter,
+                    )
             time.sleep(5)
             os.kill(os.getpid(), signal.SIGTERM)
 
