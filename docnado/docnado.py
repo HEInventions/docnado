@@ -341,6 +341,21 @@ def build_meta_cache(root):
 
     doc_files_meta = {os.path.relpath(path, start=root): _meta(path) for path in doc_files}
     doc_files_meta = {path: value for path, value in doc_files_meta.items() if value is not None}
+
+    # If a nav filter is set, exclude relevant documents.
+    # This takes the comma separated string supplied to `nav_limit`
+    # and excludes certain documents if they are NOT in this list.
+    global CMD_ARGS
+    if CMD_ARGS.nav_limit:
+        nav_filters = CMD_ARGS.nav_limit.split(',')
+        nav_filters = [filter.strip().lower() for filter in nav_filters]
+        nav_filters = [filter for filter in nav_filters if filter]
+
+        def _should_include(doc_meta):
+            nav_strings = [nav.lower() for nav in doc_meta.get('nav', [])]
+            return any([y.startswith(x) for x in nav_filters for y in nav_strings])
+        doc_files_meta = {path: value for path, value in doc_files_meta.items() if _should_include(value)}
+
     return doc_files_meta
 
 
@@ -522,35 +537,10 @@ def generate_static_pdf(app, root_dir, output_dir, nav_filter=None):
     into `output_dir`.
     """
     global PORT_NUMBER
-    # All the markdown document paths:
-    markdown_paths = [d for d in glob.iglob(f'{root_dir}/**/*', recursive=True) if os.path.isfile(d) and d.endswith('.md')]
+    # Find all markdown document paths that are in the nav.
+    documents = build_meta_cache(root_dir)
+    markdown_docs_urls = ['pdf/' + file.replace('\\', '/') for file in documents.keys()]
 
-    # Filter the documents without the required nav structure, if set.
-    if nav_filter is not None:
-        temp = []
-        for path in markdown_paths:
-            # FOR SOME REASON THIS FILE CAUSES BUGS AND I CAN'T WORK OUT WHY
-            if path == '/home/alexander/docnado/docnado/docs/documents/tables.md':
-                continue
-            with open(path) as md_data:
-                raw = md_data.read()
-                if has_nav(raw.lower()):
-                    md = markdown.Markdown(extensions=mdextensions)
-                    print(path)
-                    Markup(md.convert(raw))
-                    # Fetch the nav defined in the metadata.
-                    nav = md.Meta.get('nav', None)[0]
-                    if nav.startswith(nav_filter):
-                        temp.append(path) 
-        markdown_paths = temp
-
-
-    markdown_docs_urls = [
-            filename.replace(f'{root_dir}{os.path.sep}', 'pdf/').replace('\\', '/')
-            for filename
-            in markdown_paths
-            ]
-    
     # Generate URl to file pairs.
     pairs = [(f'http://localhost:{PORT_NUMBER}/{url}',
              f'{os.path.join(output_dir, *os.path.split(url))}.pdf')
@@ -640,9 +630,11 @@ def load_project_logo(logo_file=None):
 def check_pdf_generation_cap():
     """ Check to see if we can use PDF generation by attempting to use the binary. """
     global WKHTMLTOPDF_BINARY
-    if subprocess.getoutput(f'{WKHTMLTOPDF_BINARY} --version'):
-        return True
-    return False
+    retcode = subprocess.call(f'{WKHTMLTOPDF_BINARY} --version',
+                              shell=True,
+                              stdout=subprocess.DEVNULL,
+                              stderr=subprocess.DEVNULL)
+    return retcode == 0
 
 
 def copy_local_project(force=False):
@@ -888,8 +880,9 @@ class ReloadHandler(PatternMatchingEventHandler):
         self.flask_app.build_navigation_cache()
 
 
-global NAV_MENU, PROJECT_LOGO, WKHTMLTOPDF_BINARY, PDF_GENERATION_ENABLED, PORT_NUMBER
+global CMD_ARGS, NAV_MENU, PROJECT_LOGO, WKHTMLTOPDF_BINARY, PDF_GENERATION_ENABLED, PORT_NUMBER
 
+CMD_ARGS = None
 NAV_MENU = {}
 PROJECT_LOGO = None
 WKHTMLTOPDF_BINARY = None
@@ -913,9 +906,10 @@ def main():
                         help='Generate static PDFs from the server and output to the \
                         specified directory.')
 
-    parser.add_argument('--nav', action='store', dest='nav_filter',
+    parser.add_argument('--nav_limit', action='store', dest='nav_limit',
                         default = None,
-                        help='Define a subset of documents to convert to pdf.')
+                        help='Include certain document trees only based on a comma separated \
+                        list of nav strings. e.g. Tooling,Document')
 
     parser.add_argument('--new', action="store_true", dest='new_project',
                         default=False,
@@ -947,7 +941,11 @@ def main():
     parser.add_argument('--port', action="store", dest='new_port_number',
                         default=False,
                         help='Specify a port for the docnado server')
+
+    # Import the command line args and make them application global.
+    global CMD_ARGS
     args = parser.parse_args()
+    CMD_ARGS = args
 
     # Load config from the environment and validate it.
     global PROJECT_LOGO, PDF_GENERATION_ENABLED, NAV_MENU, WKHTMLTOPDF_BINARY
@@ -1057,8 +1055,7 @@ def main():
             generate_static_pdf(
                     app,
                     dir_documents,
-                    os.path.join(os.getcwd(), args.pdf_output_dir),
-                    args.nav_filter,
+                    os.path.join(os.getcwd(), args.pdf_output_dir)
                     )
             time.sleep(5)
             os.kill(os.getpid(), signal.SIGTERM)
