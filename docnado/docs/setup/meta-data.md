@@ -39,7 +39,7 @@ template
 : Says which `HTML` page should be used to render the content. You can make your own `HTML` templates for different styles of documentation.
 
 nav
-: Defines where the document should appear in the menu structure. For instance `Folder A>Folder B>Doc Name` would put our document inside `Folder B` which is inside `Folder A`. These directories are artificial and you can put in whatever makes sense.
+: Defines where the document should appear in the menu structure. For instance `Folder A>Folder B>Doc Name` would put our document inside `Folder B` which is inside `Folder A`. These directories are artificial and you can put in whatever makes sense. You can also use `Folder A __99__>Folder B __-1__>Doc Name __12__` to apply weights that order the nav menu.
 
 percent
 : Is a number between `0` and `100`. If this is left out or is set to `100` then nothing happens. However, if you are working on a document then setting this will put a progress bar in the document header.
