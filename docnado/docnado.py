@@ -45,6 +45,8 @@ from markdown.postprocessors import Postprocessor
 from markdown.inlinepatterns import LinkPattern, IMAGE_LINK_RE, dequote, handleAttributes
 from markdown.blockprocessors import HashHeaderProcessor
 
+from navtree import NavItem, parse_nav_string
+
 
 class MultiPurposeLinkPattern(LinkPattern):
     """ Embed image, video, youtube, csv or file download links
@@ -360,22 +362,38 @@ def build_meta_cache(root):
 
 
 def build_nav_menu(meta_cache):
-    """ Given a cache of Markdown `Meta` data, compile a structure that can be
-    used to generate the NAV menu.
-    This uses the `nav: Assembly>Bench>Part` variable at the top of the Markdown file.
-    """
-    tree = collections.UserDict()
-    for url, meta in meta_cache.items():
-        # Get the NAV strings from the metadata.
-        navgroup = meta.get('nav', [])
-        for navstr in navgroup:
-            t = tree
-            for part in navstr.split('>'):
-                t = t.setdefault(part, collections.UserDict())
-            t.meta = meta
-            t.link = url
-    return tree
+    # """ Given a cache of Markdown `Meta` data, compile a structure that can be
+    # used to generate the NAV menu.
+    # This uses the `nav: Assembly>Bench>Part` variable at the top of the Markdown file.
+    # """
+    # tree = collections.UserDict()
+    # for url, meta in meta_cache.items():
+    #     # Get the NAV strings from the metadata.
+    #     navgroup = meta.get('nav', [])
+    #     for navstr in navgroup:
+    #         t = tree
+    #         for part in navstr.split('>'):
+    #             t = t.setdefault(part, collections.UserDict())
+    #         t.meta = meta
+    #         t.link = url
+    # return tree
+    root = NavItem('root', 0)
+    for path, meta in meta_cache.items():
+        nav_str = meta.get('nav', [None])[0]
+        nav_chunks = parse_nav_string(nav_str)
 
+
+
+        node = root
+        for name, weight in nav_chunks:
+            n = NavItem(name, weight)
+            node = node.add(n)
+
+        node.meta = meta
+        node.link = path
+
+    root.arrange()
+    return root
 
 def build_reload_files_list(extra_dirs=[]):
     """ Given a list of directories, return a list of files to watch for modification

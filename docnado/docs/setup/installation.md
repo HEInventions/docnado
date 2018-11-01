@@ -3,7 +3,7 @@ desc:       The official docnado installation guide.
 date:       2018/10/11
 version:    1.0.0
 template:   document
-nav:        Get Setup>Installation
+nav:        Get Setup __1__>Installation
 percent:    100
 authors:    enq@heinventions.com
 

@@ -3,7 +3,7 @@ desc:       Rapid documentation tool to blow you away.
 date:       2018/08/05
 version:    1.0.0
 template:   document
-nav:        Home
+nav:        Home __-1__
 percent:    100
 authors:    enq@heinventions.com
 
