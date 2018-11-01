@@ -28,7 +28,7 @@ setup(
         'timeago==1.0.8',
         'Frozen-Flask==0.15',
         'beautifulsoup4==4.6.3',
-        'requests==2.19.1',
+        'requests==2.20.0',
         'watchdog==0.9.0',
     ],
     classifiers=(
