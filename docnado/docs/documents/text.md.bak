@@ -28,7 +28,7 @@ Mark the start of section, subsection, or paragraph with the *header* tag. This 
 ###### H6
 
 
-Please note that Docnado will render `# Heading 1` as a `<h2>` element. This way, `<h1>` is reserved for document titles and the PDF bookmark index / table of contents will generate correctly.
+Please note that docnado will render `# Heading 1` as a `<h2>` element. This way, `<h1>` is reserved for document titles and the PDF bookmark index / table of contents will generate correctly.
 {: .info}
 
 # Text Styles
@@ -69,10 +69,10 @@ You declare them by simply using a greater-than symbol followed by a space (`> `
 Quote break.
 
 ```markdown
-> This is a long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a block-quote.
+> This is a long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote.
 ```
 
-> This is a long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a block-quote.
+> This is a long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote.
 
 
 # Text Styles
