@@ -144,7 +144,7 @@ class MultiPurposeLinkPattern(LinkPattern):
         root.set('source', src)
         root.set('class', 'csv-table table thead-light table-hover')
         file_path = os.path.join(self.markdown.page_root, src)
-        with open(file_path) as f:
+        with open(file_path, 'r' encoding="utf-8") as f:
             reader = csv.reader(f)
             headers = next(reader)
             rows = [r for r in reader]
@@ -334,7 +334,7 @@ def build_meta_cache(root):
     doc_files = glob.iglob(root + '/**/*.md', recursive=True)
 
     def _meta(path):
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding="utf-8") as f:
             md = markdown.Markdown(extensions=mdextensions)
             md.page_root = os.path.dirname(path)
             Markup(md.convert(f.read()))
@@ -413,7 +413,7 @@ def _render_markdown(file_path, **kwargs):
     """
     global NAV_MENU, PROJECT_LOGO, PDF_GENERATION_ENABLED
     DEFAULT_TEMPLATE = 'document'
-    with open(file_path, 'r') as f:
+    with open(file_path, 'r', encoding="utf-8") as f:
         md = markdown.Markdown(extensions=mdextensions)
         md.page_root = os.path.dirname(file_path)
         markup = Markup(md.convert(f.read()))
@@ -696,7 +696,7 @@ def find_references(document_path):
     with paths that are relative to the directory containing the `document_path`.
     """
     # Open the file to search.
-    with open(document_path, 'r') as f:
+    with open(document_path, 'r', encoding="utf-8") as f:
         markdown_raw_data = f.read()
 
     # Render as HTML.
@@ -751,7 +751,7 @@ def find_orphans(files):
     md_with_nav = []
     for file in files:
         if file.endswith('.md'):
-            with open(file) as f:
+            with open(file, encoding="utf-8") as f:
                 if has_nav(f.read().lower()):
                     md_with_nav.append(file)
 
@@ -779,7 +779,7 @@ class DocumentLinks:
         self.md_dir = os.path.dirname(md_file)
 
         # Read in Markdown and generate HTML with our parser.
-        with open(md_file, 'r') as f:
+        with open(md_file, 'r', encoding="utf-8") as f:
             markdown_raw_data = f.read()
         md = markdown.Markdown(extensions=mdextensions)
         md.page_root = self.md_dir
@@ -880,7 +880,7 @@ def generate_metadata(path):
     for key in metadata.keys():
         result += ('{}:{}{}\n'.format(key, '\t' if len(key) > 6 else '\t\t', metadata[key]))
 
-    with open(path, 'r+') as f:
+    with open(path, 'r+', encoding="utf-8") as f:
         content = f.read()
         f.seek(0, 0)
         f.write(result)
