@@ -144,7 +144,7 @@ class MultiPurposeLinkPattern(LinkPattern):
         root.set('source', src)
         root.set('class', 'csv-table table thead-light table-hover')
         file_path = os.path.join(self.markdown.page_root, src)
-        with open(file_path, 'r' encoding="utf-8") as f:
+        with open(file_path, 'r', encoding="utf-8") as f:
             reader = csv.reader(f)
             headers = next(reader)
             rows = [r for r in reader]
