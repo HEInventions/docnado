@@ -55,7 +55,7 @@ class NavItem:
         """ Return pairs of names,items of the children.
         """
         return [(child.name, child) for child in self.children]
-
+    
     def add(self, node):
         """ Add a new child to this menu item. If a child with the same name already
         exists then return that child. If a child with the same name does not
