@@ -39,12 +39,12 @@ If you want it to auto-watch, run as admin from this directory, and remember to 
 ```bash
 pip install watchdog
 watchmedo shell-command --patterns="*.scss" --recursive --command='echo "${watch_src_path}" && sassc style/static/default.scss style/static/default.css' .
-````
+```
 
 ## Code Style
 
 We use `flake8 docnado.py --max-line-length=110` to static check the code.
-""
+
 ## Rebuilding the PyPi Package
 
 PyPi
