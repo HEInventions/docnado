@@ -51,11 +51,10 @@ class NavItem:
         self.weight = weight
         self.children = []
 
-        self.meta = []
-
     def items(self):
+        """ Return pairs of names,items of the children.
+        """
         return [(child.name, child) for child in self.children]
-
 
     def add(self, node):
         """ Add a new child to this menu item. If a child with the same name already
