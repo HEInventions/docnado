@@ -7,7 +7,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='docnado',
-    version='1.0.3',
+    version='1.0.4',
     author='Hardy & Ellis Inventions LTD',
     author_email='support@heinventions.com',
 
