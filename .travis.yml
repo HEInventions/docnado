@@ -1,0 +1,14 @@
+language: python
+cache: pip
+sudo: false
+
+python:
+- 3.6
+- 3.7-dev
+
+install: pip install -U tox-travis
+
+script: tox
+
+only:
+  - master

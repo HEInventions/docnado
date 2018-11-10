@@ -5,6 +5,8 @@ from setuptools import setup, find_packages
 with open('README.md', 'r') as f:
     long_description = f.read()
 
+test_requirements = ['tox', 'pytest', 'pytest-testdox', 'pytest-testdirectory', ]
+
 setup(
     name='docnado',
     version='1.0.4',
@@ -19,9 +21,11 @@ setup(
 
     python_requires='>=3.6.0',
 
-    packages=find_packages(),
+    packages=find_packages(include=['docnado']),
     include_package_data=True,
     py_modules=['docnado'],
+    test_suite='tests',
+    tests_require=test_requirements,
     install_requires=[
         'Flask==1.0.2',
         'Markdown==2.6.11',
