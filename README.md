@@ -98,17 +98,17 @@ Documents must end in **lowercase** `.md`. For example: `mydocument.md`.
 
 ### Virtual Environment
 
-```python
+```bash
 python -m virtualenv env
 env/Scripts/activate.bat # or the bash equivalent
 pip install -r requirements.txt
 ```
 
-```python
+```bash
 python docnado.py # with options
 ```
 
-```python
+```bash
 pip install flake8
 flake8 docnado.py --max-line-length=120
 ```
@@ -141,7 +141,7 @@ We use `flake8 docnado.py --max-line-length=110` to static check the code.
 
 PyPi
 
-```
+```bash
 python -m pip install --user --upgrade setuptools wheel twine
 python setup.py sdist bdist_wheel
 
@@ -150,7 +150,7 @@ python -m twine upload dist/*
 
 Executable
 
-```
+```bash
 env\Scripts\activate.bat
 pip install pyinstaller
 pyinstaller docnado.py
