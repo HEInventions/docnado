@@ -65,3 +65,18 @@ class TestRunDocnadoWithArguments:
         os.chdir(str(testdirectory))
         retval = call('docnado --find-broken-links', shell=True)
         assert retval == 255
+
+    def test_Docnado_find_orphans(self, testdirectory):
+        """
+        Test orphan file checking functionality.
+        "docnado --find-orphans"
+        """
+        testdirectory.run('docnado --new')
+        output = testdirectory.run('docnado --find-orphans')
+        assert output.returncode == 0
+
+        testdirectory.write_text('docs/items/assets/test.png', "test", 'utf8')
+        os.chdir(str(testdirectory))
+        retval = call('docnado --find-orphans', shell=True)
+        assert retval == 255
+
