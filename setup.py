@@ -9,7 +9,7 @@ test_requirements = ['tox', 'pytest', 'pytest-testdox', 'pytest-testdirectory', 
 
 setup(
     name='docnado',
-    version='1.0.4',
+    version='1.0.5',
     author='Hardy & Ellis Inventions LTD',
     author_email='support@heinventions.com',
 
