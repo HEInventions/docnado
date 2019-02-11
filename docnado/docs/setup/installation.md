@@ -10,7 +10,7 @@ authors:    enq@heinventions.com
 
 # TLDR;
 
-To install docnado using [pip](https://pip.pypa.io) use the following command:
+To install docnado using [pip](https://pip.pypa.io/en/stable/) use the following command:
 
 ```bash
 python3 -m pip install docnado --upgrade
@@ -20,7 +20,7 @@ python3 -m pip install docnado --upgrade
 
 Docnado is compatible with Microsoft Windows, Mac OSX, and most GNU/Linux distributions.
 
-Docnado requires `Python 3.6` or higher to be installed on your system. This should be available through your systems package manager or via direct download at [www.python.org](http://www.python.org). You will also need to install the pip package management system, available at [pip.pypa.io](https://pip.pypa.io).
+Docnado requires `Python 3.6` or higher to be installed on your system. This should be available through your systems package manager or via direct download at [www.python.org](https://www.python.org). You will also need to install the pip package management system, available at [pip.pypa.io](https://pip.pypa.io/en/stable/).
 
 To check if you have `Python 3.6` and `Pip` installed, from your command prompt, run:
 

@@ -45,7 +45,9 @@ from markdown.postprocessors import Postprocessor
 from markdown.inlinepatterns import LinkPattern, IMAGE_LINK_RE, dequote, handleAttributes
 from markdown.blockprocessors import HashHeaderProcessor
 
-from .navtree import NavItem, parse_nav_string
+from http.client import responses
+
+from navtree import NavItem, parse_nav_string
 
 
 class MultiPurposeLinkPattern(LinkPattern):
@@ -557,10 +559,12 @@ def generate_static_pdf(app, root_dir, output_dir, nav_filter=None):
 
 # Helper function to return the domain if present.
 def is_absolute(url):
-    """ Returns True if the passed url string is an absolute path
+    """ Returns True if the passed url string is an absolute path.
         False if not
     """
-    return bool(urlparse(url).netloc)
+    links = urlparse(url)
+
+    return bool(links.netloc)
 
 
 def generate_static_html(app, root_dir, output_dir):
@@ -782,10 +786,18 @@ class DocumentLinks:
 
         self.references = set()
         for k, v in tags_to_search.items():
-            for tag in soup.find_all(k):
-                val = tag.get(v)
-                if val:
-                    self.references.add(val)
+            links = soup.find_all(k)
+
+            for link in links:
+                if link.get('href'):
+                    if link.get('href').find('http:') > -1 or link.get('href').find('https:') > -1:
+                        val = link.get(v)
+                        if val:
+                            self.references.add(val)
+                else:
+                    val = link.get(v)
+                    if val:
+                        self.references.add(val)
 
     @property
     def web_links(self):
@@ -808,7 +820,7 @@ class DocumentLinks:
         """
         try:
             request = requests.head(address)
-            return request.status_code == 200, address
+            return request.status_code, address
         except requests.exceptions.RequestException as e:
             return False, address
 
@@ -817,9 +829,9 @@ class DocumentLinks:
         which are broken (i.e. do not resolve to HTTP200OK or a file on disk).
         """
         result = process_pool.map(self.validate_url, self.web_links)
-        for valid, url in result:
-            if not valid:
-                yield url
+        for response, url in result:
+            if not response == 200:
+                yield url + ' Status: ' + (responses[response] if response is int else "Exception")
 
         for file in self.relative_links:
             if not os.path.exists(file):
@@ -1007,9 +1019,9 @@ def main():
     if args.find_broken_links:
         process_pool = Pool(processes=10)
         md_files = glob.glob((dir_documents + '/**/*.md'), recursive=True)
-        md_reports = {md: list(DocumentLinks(md).detect_broken_links(process_pool)) for md in md_files}
+        md_reports = tuple((md, list(DocumentLinks(md).detect_broken_links(process_pool))) for md in md_files)
         num_broken = 0
-        for file, report in md_reports.items():
+        for file, report in md_reports:
             if report:
                 num_broken += len(report)
                 print(f'{file}\n\t' + '\n\t'.join(report))

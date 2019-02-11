@@ -19,7 +19,7 @@ For example:
 This is a sentence with a link to the [Google Homepage](http://www.google.co.uk "Google Search Homepage") in it.
 ```
 
-This is a sentence with a link to the [Google Homepage](http://www.google.co.uk "Google Search Homepage") in it.
+This is a sentence with a link to the [Google Homepage](http://www.gle.co.uk/ouashd9o.html "Google Search Homepage") in it.
 
 # Relative and Web Links
 This is an [inline-style](assets/relative_link.md) relative link within the directory structure.
@@ -46,8 +46,8 @@ Another useful feature is reference style linking. You can create a list of web 
 These links go to [Google], [Twitter's Homepage][Twitter], and [Wikipedia]
 ```
 
-[Google]: http://www.google.co.uk
-[Twitter]: http://www.twitter.com
-[Wikipedia]: http://en.wikipedia.org
+[Google]: https://www.google.co.uk
+[Twitter]: https://twitter.com
+[Wikipedia]: https://en.wikipedia.org/wiki/Main_Page
 
 These links go to [Google], [Twitter's Homepage][Twitter], and [Wikipedia]
