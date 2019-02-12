@@ -19,7 +19,7 @@ For example:
 This is a sentence with a link to the [Google Homepage](http://www.google.co.uk "Google Search Homepage") in it.
 ```
 
-This is a sentence with a link to the [Google Homepage](http://www.gle.co.uk/ouashd9o.html "Google Search Homepage") in it.
+This is a sentence with a link to the [Google Homepage](http://www.google.co.uk "Google Search Homepage") in it.
 
 # Relative and Web Links
 This is an [inline-style](assets/relative_link.md) relative link within the directory structure.
