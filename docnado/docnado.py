@@ -1072,6 +1072,16 @@ def main():
         PDF_GENERATION_ENABLED = False
         try:
             generate_static_html(app, dir_documents, os.path.join(os.getcwd(), args.html_output_dir))
+            index_html = """ <!DOCTYPE html>
+                <html>
+                    <head>
+                        <meta http-equiv="refresh" content="0; url=./w/">
+                    </head>
+                <body>
+                </body>
+                </html>"""
+            with open(os.path.join(os.getcwd(), args.html_output_dir, 'index.html'), 'w') as f:
+                f.write(index_html)
         except Exception as err:
             traceback.print_exc(file=sys.stderr)
             sys.exit(-1)
