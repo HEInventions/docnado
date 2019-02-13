@@ -47,7 +47,7 @@ from markdown.blockprocessors import HashHeaderProcessor
 
 from http.client import responses
 
-from navtree import NavItem, parse_nav_string
+from .navtree import NavItem, parse_nav_string
 
 
 class MultiPurposeLinkPattern(LinkPattern):
