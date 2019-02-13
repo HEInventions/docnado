@@ -963,6 +963,10 @@ def main():
                         default=False,
                         help='Specify a port for the docnado server')
 
+    parser.add_argument('--host', action="store", dest='set_host',
+                        default=False,
+                        help='Set the docnado development server to listen on IP addresses.')
+
     # Import the command line args and make them application global.
     global CMD_ARGS
     args = parser.parse_args()
@@ -1113,16 +1117,31 @@ def main():
         dn_watch_files = build_reload_files_list([__name__, dir_style])
 
     # Run the server.
-    try:
-        app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files)
-    except OSError:
-        print(f'Error initialising server. Port {PORT_NUMBER} is already in use.\nTry "--port"')
-    except KeyboardInterrupt:
-        pass
-    finally:
-        if observer:
-            observer.stop()
-            observer.join()
+    if args.set_host:
+        try:
+            print('Attempting set sevelopment server listen on public IP address: ' + args.set_host)
+            print('WARNING: The Docnado development environment is intended to be used as a development tool ONLY, '
+                  + 'and is not recommended for use in a production environment.')
+            app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files, host=args.set_host)
+        except OSError:
+            print(f'Error initialising server.')
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if observer:
+                observer.stop()
+                observer.join()
+    else:
+        try:
+            app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files)
+        except OSError:
+            print(f'Error initialising server.')
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if observer:
+                observer.stop()
+                observer.join()
 
 
 # if running brainerd directly, boot the app
