@@ -50,6 +50,7 @@ if __package__:
 else:
     from navtree import NavItem, parse_nav_string
 
+
 class MultiPurposeLinkPattern(LinkPattern):
     """ Embed image, video, youtube, csv or file download links
     by extending the typical image tag pattern.
