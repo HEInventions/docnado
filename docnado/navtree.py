@@ -49,8 +49,6 @@ class NavItem:
     def __init__(self, name, weight):
         self.name = name
         self.weight = weight
-        # self.meta = None
-        # self.link = None
         self.dom_id = self.name.replace(' ', '-')
         self.children = []
 

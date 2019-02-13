@@ -374,8 +374,6 @@ def build_nav_menu(meta_cache):
         for name, weight in nav_chunks:
             n = NavItem(name, weight)
             node = node.add(n)
-        #node.meta = meta
-        #node.link = path
         node.bind(meta=meta, link=path)
     root.arrange()
     return root
