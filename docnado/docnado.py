@@ -944,9 +944,9 @@ def main():
                         default=False,
                         help='Specify a port for the docnado server')
 
-    parser.add_argument('--nonlocal', action="store_true", dest='non_local',
+    parser.add_argument('--host', action="store", dest='set_host',
                         default=False,
-                        help='Set the docnado development server to listen on all non-local IP addresses.')
+                        help='Set the docnado development server to listen on IP addresses.')
 
     # Import the command line args and make them application global.
     global CMD_ARGS
@@ -1091,14 +1091,14 @@ def main():
         dn_watch_files = build_reload_files_list([__name__, dir_style])
 
     # Run the server.
-    if args.non_local:
+    if args.set_host:
         try:
-            print('Development server listening on all public IP addresses.')
-            print('The Docnado development environment is intended to be used as a development tool ONLY, '
+            print('Attempting set sevelopment server listen on public IP address: ' + args.set_host)
+            print('WARNING: The Docnado development environment is intended to be used as a development tool ONLY, '
                   + 'and is not recommended for use in a production environment.')
-            app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files, host='0.0.0.0')
+            app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files, host=args.set_host)
         except OSError:
-            print(f'Error initialising server. Port {PORT_NUMBER} is already in use.\nTry "--port"')
+            print(f'Error initialising server.')
         except KeyboardInterrupt:
             pass
         finally:
@@ -1109,7 +1109,7 @@ def main():
         try:
             app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files)
         except OSError:
-            print(f'Error initialising server. Port {PORT_NUMBER} is already in use.\nTry "--port"')
+            print(f'Error initialising server.')
         except KeyboardInterrupt:
             pass
         finally:
