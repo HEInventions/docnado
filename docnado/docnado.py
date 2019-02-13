@@ -21,20 +21,20 @@ import datetime
 import threading
 import traceback
 import subprocess
-import collections
 import platform
-import pathlib
 import requests
+
 from bs4 import BeautifulSoup
+
 from multiprocessing import Pool
+
 from urllib.parse import urlparse
-from collections import defaultdict
 
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
 import timeago
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ElementTree
 from flask import Flask, url_for, abort, send_from_directory, \
     render_template, Markup, make_response
 
@@ -45,8 +45,10 @@ from markdown.postprocessors import Postprocessor
 from markdown.inlinepatterns import LinkPattern, IMAGE_LINK_RE, dequote, handleAttributes
 from markdown.blockprocessors import HashHeaderProcessor
 
-from .navtree import NavItem, parse_nav_string
-
+if __package__:
+    from .navtree import NavItem, parse_nav_string
+else:
+    from navtree import NavItem, parse_nav_string
 
 class MultiPurposeLinkPattern(LinkPattern):
     """ Embed image, video, youtube, csv or file download links
@@ -74,7 +76,8 @@ class MultiPurposeLinkPattern(LinkPattern):
         else:
             return '', src_parts
 
-    def youtube_url_validation(self, url):
+    @staticmethod
+    def youtube_url_validation(url):
         """ Given a YouTube URL, return the ID component.
         https://stackoverflow.com/questions/4705996
         """
@@ -84,9 +87,10 @@ class MultiPurposeLinkPattern(LinkPattern):
         youtube_regex_match = re.match(youtube_regex, url)
         return youtube_regex_match.group(6) if youtube_regex_match else None
 
-    def as_youtube(self, m, video_id):
+    @staticmethod
+    def as_youtube(m, video_id):
         """ Return a DOM element that embeds a YouTube video. """
-        el = ET.Element('iframe')
+        el = ElementTree.Element('iframe')
         el.set('class', 'video')
         el.set('src', f'https://www.youtube.com/embed/{video_id}?rel=0')
         el.set('frameborder', '0')
@@ -98,10 +102,10 @@ class MultiPurposeLinkPattern(LinkPattern):
         """ Return a DOM element that embeds a PDF document using an embed. """
         src, parts = self.get_src(m)
 
-        wrapper = ET.Element('aside')
+        wrapper = ElementTree.Element('aside')
         wrapper.set('class', 'pdf-embed-wrapper')
 
-        el = ET.SubElement(wrapper, 'embed')
+        el = ElementTree.SubElement(wrapper, 'embed')
         el.set('class', 'pdf-embed')
         el.set('src', src)
         el.set('width', '100%')
@@ -115,7 +119,7 @@ class MultiPurposeLinkPattern(LinkPattern):
     def as_video(self, m):
         """ Return a video element """
         src, parts = self.get_src(m)
-        el = ET.Element('video')
+        el = ElementTree.Element('video')
         el.set('src', src)
         el.set("controls", "true")
         handleAttributes(m.group(2), el)
@@ -123,7 +127,7 @@ class MultiPurposeLinkPattern(LinkPattern):
 
     def as_image(self, m):
         """ Return an image element """
-        el = ET.Element('img')
+        el = ElementTree.Element('img')
         src, parts = self.get_src(m)
         el.set('src', src)
 
@@ -140,7 +144,7 @@ class MultiPurposeLinkPattern(LinkPattern):
 
     def as_csv(self, m):
         src, parts = self.get_src(m)
-        root = ET.Element('table')
+        root = ElementTree.Element('table')
         root.set('source', src)
         root.set('class', 'csv-table table thead-light table-hover')
         file_path = os.path.join(self.markdown.page_root, src)
@@ -148,22 +152,22 @@ class MultiPurposeLinkPattern(LinkPattern):
             reader = csv.reader(f)
             headers = next(reader)
             rows = [r for r in reader]
-            thead = ET.SubElement(root, 'thead')
+            thead = ElementTree.SubElement(root, 'thead')
             for col in headers:
-                ET.SubElement(thead, 'th').text = col
+                ElementTree.SubElement(thead, 'th').text = col
             for row in rows:
-                tr = ET.SubElement(root, 'tr')
+                tr = ElementTree.SubElement(root, 'tr')
                 for col in row:
-                    ET.SubElement(tr, 'td').text = col
+                    ElementTree.SubElement(tr, 'td').text = col
         return root
 
     def as_download(self, m):
         """ Create card layers used to make a download button. """
         src, parts = self.get_src(m)
 
-        # Returns a human readable string reprentation of bytes
-        def _human_size(bytes, units=[' bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB']):
-            return str(bytes) + units[0] if bytes < 1024 else _human_size(bytes >> 10, units[1:])
+        # Returns a human readable string representation of bytes
+        def _human_size(byte_number, units=(' bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB')):
+            return str(byte_number) + units[0] if byte_number < 1024 else _human_size(byte_number >> 10, units[1:])
 
         # Get information required for card.
         split_src = os.path.split(src)
@@ -185,11 +189,11 @@ class MultiPurposeLinkPattern(LinkPattern):
         #             preview_uri = u'data:%s;base64,%s' % (mime, data64)
 
         # Card and structure.
-        card = ET.Element("div")
+        card = ElementTree.Element("div")
         card.set('class', 'card download-card')
-        header = ET.SubElement(card, 'div')
+        header = ElementTree.SubElement(card, 'div')
         header.set('class', 'download-card-header')
-        body = ET.SubElement(card, 'div')
+        body = ElementTree.SubElement(card, 'div')
         body.set('class', 'download-card-body')
 
         # Add preview image.
@@ -198,25 +202,26 @@ class MultiPurposeLinkPattern(LinkPattern):
         #     img.set('src', preview_uri)
 
         # Filename link heading.
-        heading = ET.SubElement(body, 'a')
+        heading = ElementTree.SubElement(body, 'a')
         heading.set('class', 'download-card-title')
         heading.set('href', src)
-        download_icon = ET.SubElement(heading, 'i')
+        download_icon = ElementTree.SubElement(heading, 'i')
         download_icon.set('class', 'fa fa-download')
-        download_text = ET.SubElement(heading, 'span')
+        download_text = ElementTree.SubElement(heading, 'span')
         download_text.text = file_basename
 
         # Title element from the "quote marks" part.
-        body_desc = ET.SubElement(body, 'span')
+        body_desc = ElementTree.SubElement(body, 'span')
         body_desc.text = card_text
 
         # File size span at the bottom.
-        body_size = ET.SubElement(body, 'span')
+        body_size = ElementTree.SubElement(body, 'span')
         body_size.set('class', 'small text-muted')
         body_size.text = f'{_human_size(file_size)}'
         return card
 
-    def _is_download(self, m):
+    @staticmethod
+    def _is_download(m):
         """ Determine if the ALT text [] part of the link says 'DOWNLOAD'. """
         alt = m.group(2)
         return alt.lower() == 'download'
@@ -254,7 +259,7 @@ class OffsetHashHeaderProcessor(HashHeaderProcessor):
             if before:
                 self.parser.parseBlocks(parent, [before])
             heading_level = len(m.group('level'))
-            h = ET.SubElement(parent, 'h%d' % (heading_level + self.HEADING_LEVEL_OFFSET))
+            h = ElementTree.SubElement(parent, 'h%d' % (heading_level + self.HEADING_LEVEL_OFFSET))
             h.text = m.group('header').strip()
             if after:
                 blocks.insert(0, after)
@@ -274,7 +279,8 @@ class ChecklistPostprocessor(Postprocessor):
         html = html.replace(before, after)
         return html
 
-    def _convert_checkbox(self, match):
+    @staticmethod
+    def _convert_checkbox(match):
         state = match.group(1)
         checked = ' checked' if state != ' ' else ''
         return '<li><input type="checkbox" disabled%s>' % checked
@@ -329,7 +335,7 @@ mdextensions = [MultiExtension(),
 def build_meta_cache(root):
     """ Recursively search for Markdown files and build a cache of `Meta`
     from metadata in the Markdown.
-    :param str root The path to search for files from.
+    :param root: str: The path to search for files from.
     """
     doc_files = glob.iglob(root + '/**/*.md', recursive=True)
 
@@ -339,7 +345,6 @@ def build_meta_cache(root):
             md.page_root = os.path.dirname(path)
             Markup(md.convert(f.read()))
             return md.Meta if hasattr(md, 'Meta') else None
-        return None
 
     doc_files_meta = {os.path.relpath(path, start=root): _meta(path) for path in doc_files}
     doc_files_meta = {path: value for path, value in doc_files_meta.items() if value is not None}
@@ -350,8 +355,8 @@ def build_meta_cache(root):
     global CMD_ARGS
     if CMD_ARGS.nav_limit:
         nav_filters = CMD_ARGS.nav_limit.split(',')
-        nav_filters = [filter.strip().lower() for filter in nav_filters]
-        nav_filters = [filter for filter in nav_filters if filter]
+        nav_filters = [nav_filter.strip().lower() for nav_filter in nav_filters]
+        nav_filters = [nav_filter for nav_filter in nav_filters if nav_filter]
 
         def _should_include(doc_meta):
             nav_strings = [nav.lower() for nav in doc_meta.get('nav', [])]
@@ -379,7 +384,8 @@ def build_nav_menu(meta_cache):
     root.arrange()
     return root
 
-def build_reload_files_list(extra_dirs=[]):
+
+def build_reload_files_list(extra_dirs):
     """ Given a list of directories, return a list of files to watch for modification
     and subsequent server reload. """
     extra_files = extra_dirs[:]
@@ -396,7 +402,7 @@ def _render_markdown(file_path, **kwargs):
     """ Given a `file_path` render the Markdown and return the result of `render_template`.
     """
     global NAV_MENU, PROJECT_LOGO, PDF_GENERATION_ENABLED
-    DEFAULT_TEMPLATE = 'document'
+    default_template = 'document'
     with open(file_path, 'r', encoding='utf-8') as f:
         md = markdown.Markdown(extensions=mdextensions)
         md.page_root = os.path.dirname(file_path)
@@ -404,7 +410,7 @@ def _render_markdown(file_path, **kwargs):
 
         # Fetch the template defined in the metadata.
         template = md.Meta.get('template', None)
-        template = template[0] if template else DEFAULT_TEMPLATE
+        template = template[0] if template else default_template
         if not template:
             raise Exception('no template found for document')
         template = f'{template}.html'
@@ -442,8 +448,8 @@ def configure_flask(app, root_dir):
         """ Return a gravatar link for a given email address. """
         url = "https://secure.gravatar.com/avatar/" if use_ssl else "http://www.gravatar.com/avatar/"
         email = email.strip().lower().encode('utf-8')
-        hashemail = hashlib.md5(email).hexdigest()
-        return f'{url}{hashemail}?s={size}&r={rating}&d={default}'
+        hash_email = hashlib.md5(email).hexdigest()
+        return f'{url}{hash_email}?s={size}&r={rating}&d={default}'
 
     @app.template_filter()
     def timesince(dt, past_="ago", future_="from now", default="just now"):
@@ -909,7 +915,7 @@ def main():
                         specified directory.')
 
     parser.add_argument('--nav_limit', action='store', dest='nav_limit',
-                        default = None,
+                        default=None,
                         help='Include certain document trees only based on a comma separated \
                         list of nav strings. e.g. Tooling,Document')
 
@@ -967,9 +973,6 @@ def main():
     if not os.path.exists(dir_style) and not os.path.isdir(dir_style):
         dir_style = os.path.join(os.path.dirname(__file__), 'style')
 
-    # app_project_name = os.environ.get('DN_PROJECT_NAME', 'Documentation')
-    # app_project_icon = os.environ.get('DN_PROJECT_ICON', os.path.join(dir_style, 'icon.png'))
-
     # Attempt to load the project logo into a base64 data uri.
     PROJECT_LOGO = load_project_logo(logo_location)
 
@@ -996,7 +999,7 @@ def main():
         return 0
 
     if args.find_orphans:
-        # Find all the assets in the directory/subdirectorys recursively and append their filepath to a list.
+        # Find all the assets in the directory/subdirectories recursively and append their file path to a list.
         files = glob.glob((dir_documents + '/**/*.*'), recursive=True)
         orphans = find_orphans(files)
         if orphans:
