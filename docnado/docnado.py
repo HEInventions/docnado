@@ -45,7 +45,7 @@ from markdown.postprocessors import Postprocessor
 from markdown.inlinepatterns import LinkPattern, IMAGE_LINK_RE, dequote, handleAttributes
 from markdown.blockprocessors import HashHeaderProcessor
 
-from navtree import NavItem, parse_nav_string
+from .navtree import NavItem, parse_nav_string
 
 
 class MultiPurposeLinkPattern(LinkPattern):
