@@ -49,13 +49,22 @@ class NavItem:
     def __init__(self, name, weight):
         self.name = name
         self.weight = weight
+        # self.meta = None
+        # self.link = None
+        self.dom_id = self.name.replace(' ', '-')
         self.children = []
 
     def items(self):
         """ Return pairs of names,items of the children.
         """
         return [(child.name, child) for child in self.children]
-    
+
+    def bind(self, meta, link):
+        """ Bind a file link to the document and its associated metadata to this NavItem.
+        """
+        self.meta = meta
+        self.link = link
+
     def add(self, node):
         """ Add a new child to this menu item. If a child with the same name already
         exists then return that child. If a child with the same name does not

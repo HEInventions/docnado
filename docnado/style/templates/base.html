@@ -93,8 +93,8 @@
                 </li>
                 {% else %}
                 <li>
-                    <input type="checkbox" {% if nav is defined and key not in nav[0] %}checked{% endif %} id="#nav-{{key|replace(' ', '-')}}">
-                    <label for="#nav-{{key|replace(' ', '-')}}">
+                    <input type="checkbox" {% if nav is defined and key not in nav[0] %}checked{% endif %} id="#nav-{{value.dom_id}}">
+                    <label for="#nav-{{value.dom_id}}">
                         <i class="tree-icon fa fa-fw fa-chevron-down"></i>
                         <span>{{ key }}</span>
                     </label>
