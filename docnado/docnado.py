@@ -34,7 +34,7 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
 import timeago
-import xml.etree.ElementTree as ElementTree
+from xml.etree import ElementTree
 from flask import Flask, url_for, abort, send_from_directory, \
     render_template, Markup, make_response
 
