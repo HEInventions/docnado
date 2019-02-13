@@ -84,7 +84,7 @@
 
                 {% if value.link is defined %}
                 <li class="tree-leaf">
-                    {% if nav is defined and nav[0].split('>')[-1] == key %}
+                    {% if nav is defined and nav[0].split('>')[-1].split('__')[0].strip() == key %}
                         <i class="fa fa-circle" aria-hidden="true"></i>
                     {% else %}
                         <i class="fa fa-circle-thin" aria-hidden="true"></i>
