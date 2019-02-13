@@ -45,7 +45,7 @@ from markdown.postprocessors import Postprocessor
 from markdown.inlinepatterns import LinkPattern, IMAGE_LINK_RE, dequote, handleAttributes
 from markdown.blockprocessors import HashHeaderProcessor
 
-from .navtree import NavItem, parse_nav_string
+from navtree import NavItem, parse_nav_string
 
 
 class MultiPurposeLinkPattern(LinkPattern):
@@ -944,6 +944,10 @@ def main():
                         default=False,
                         help='Specify a port for the docnado server')
 
+    parser.add_argument('--nonlocal', action="store_true", dest='non_local',
+                        default=False,
+                        help='Set the docnado development server to listen on all non-local IP addresses.')
+
     # Import the command line args and make them application global.
     global CMD_ARGS
     args = parser.parse_args()
@@ -1087,16 +1091,31 @@ def main():
         dn_watch_files = build_reload_files_list([__name__, dir_style])
 
     # Run the server.
-    try:
-        app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files)
-    except OSError:
-        print(f'Error initialising server. Port {PORT_NUMBER} is already in use.\nTry "--port"')
-    except KeyboardInterrupt:
-        pass
-    finally:
-        if observer:
-            observer.stop()
-            observer.join()
+    if args.non_local:
+        try:
+            print('Development server listening on all public IP addresses.')
+            print('The Docnado development environment is intended to be used as a development tool ONLY, '
+                  + 'and is not recommended for use in a production environment.')
+            app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files, host='0.0.0.0')
+        except OSError:
+            print(f'Error initialising server. Port {PORT_NUMBER} is already in use.\nTry "--port"')
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if observer:
+                observer.stop()
+                observer.join()
+    else:
+        try:
+            app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files)
+        except OSError:
+            print(f'Error initialising server. Port {PORT_NUMBER} is already in use.\nTry "--port"')
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if observer:
+                observer.stop()
+                observer.join()
 
 
 # if running brainerd directly, boot the app
