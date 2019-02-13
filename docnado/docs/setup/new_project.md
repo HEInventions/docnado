@@ -40,7 +40,7 @@ $ docnado
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-And visit [http://127.0.0.1:5000](http://127.0.0.1:5000) to see docnado in action.
+And visit http://127.0.0.1:5000 to see docnado in action.
 
 If you make changes to the templates and styles, you will need to rebuild the `scss` and restart docnado.
 {: .tip}
