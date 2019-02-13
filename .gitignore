@@ -23,6 +23,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.idea
 
 # Explicitly include files under docnado/
 !docnado/docs/**
