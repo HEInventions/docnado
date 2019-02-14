@@ -301,7 +301,7 @@ $content-width: 750px;
         &.full-width { max-width: 100%; }      // for csv includes...
 
         font-size: 0.8em;
-        background: #88888808;
+        background: #f8f9fa;
 
         img, video {
             display: block;
@@ -326,6 +326,11 @@ $content-width: 750px;
      .download-card .download-card-body>a { display: block; font-size: 20px; }
      .download-card .download-card-body>a>i { padding-right: 10px; }
      .download-card .download-card-body>span { display: block; }
+
+     h2 {
+         font-weight: bold;
+     }
+
 
 }
 
