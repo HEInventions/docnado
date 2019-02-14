@@ -76,6 +76,7 @@ class MultiPurposeLinkPattern(LinkPattern):
             if src[0] == "<" and src[-1] == ">":
                 src = src[1:-1]
             return self.sanitize_url(self.unescape(src)), src_parts
+
         else:
             return '', src_parts
 
@@ -234,16 +235,21 @@ class MultiPurposeLinkPattern(LinkPattern):
         src, parts = self.get_src(m)
         if self._is_download(m):
             return self.as_download(m)
+
         youtube = self.youtube_url_validation(src)
         if youtube:
             return self.as_youtube(m, youtube)
+
         src_lower = src.lower()
         if src_lower.endswith(self.SUPPORTED_TABLES):
             return self.as_csv(m)
+
         elif src_lower.endswith(self.SUPPORTED_PDF):
             return self.as_pdf(m)
+
         elif src_lower.endswith(self.SUPPORTED_VIDEO):
             return self.as_video(m)
+
         return self.as_image(m)
 
 
@@ -818,6 +824,7 @@ class DocumentLinks:
         """
         def _norm(path):
             return os.path.join(self.md_dir, urllib.request.url2pathname(path))
+
         return [_norm(link) for link in self.references if not is_absolute(link)]
 
     @staticmethod
@@ -827,6 +834,7 @@ class DocumentLinks:
         try:
             request = requests.head(address)
             return request.status_code, address
+
         except requests.exceptions.RequestException as e:
             return False, address
 
@@ -926,7 +934,7 @@ def main():
                         help='Generate static PDFs from the server and output to the \
                         specified directory.')
 
-    parser.add_argument('--nav_limit', action='store', dest='nav_limit',
+    parser.add_argument('--nav-limit', action='store', dest='nav_limit',
                         default=None,
                         help='Include certain document trees only based on a comma separated \
                         list of nav strings. e.g. Tooling,Document')
@@ -1021,6 +1029,7 @@ def main():
         if orphans:
             print(f'{len(orphans)} Unused assets (orphans):\n\t' + '\n\t'.join(orphans))
             return -1
+
         return 0
 
     if args.find_broken_links:
@@ -1122,7 +1131,8 @@ def main():
             print('WARNING: The Docnado development environment is intended to be used as a development tool ONLY, '
                   + 'and is not recommended for use in a production environment.')
             app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files, host=args.set_host)
-        except OSError:
+        except OSError as e:
+            print(e)
             print(f'Error initialising server.')
         except KeyboardInterrupt:
             pass
@@ -1133,7 +1143,8 @@ def main():
     else:
         try:
             app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files)
-        except OSError:
+        except OSError as e:
+            print(e)
             print(f'Error initialising server.')
         except KeyboardInterrupt:
             pass
