@@ -1,5 +1,5 @@
 /**
- * docnado template default styles.
+ * Docnado template default styles.
  *
  */
 body header.page-headbar {
@@ -103,6 +103,9 @@ body.page-sidebar-closed .page-main {
   border-top: 1px solid #f0f0f0;
   padding-top: 42px;
   padding-bottom: 10px; }
+
+.page-md h2, .page-md h3, .page-md h4, .page-md h5, .page-md h6 {
+  font-weight: bold; }
 
 .page-md p {
   text-align: justify; }
@@ -405,7 +408,7 @@ body.page-sidebar-closed .page-main {
 .page-md table {
   max-width: 750px;
   font-size: 0.8em;
-  background: #88888808; }
+  background: #f8f9fa; }
   .page-md table.full-width {
     max-width: 100%; }
   .page-md table img, .page-md table video {
