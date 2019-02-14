@@ -118,10 +118,6 @@ $content-width: 750px;
     // Title header.
     h1 {  border-top: 1px solid #f0f0f0; padding-top: 42px; padding-bottom: 10px; }
 
-    h2, h3, h4, h5, h6 {
-        font-weight: bold;
-    }
-
     // Paragraph styling.
      p {
          text-align: justify;
@@ -330,6 +326,11 @@ $content-width: 750px;
      .download-card .download-card-body>a { display: block; font-size: 20px; }
      .download-card .download-card-body>a>i { padding-right: 10px; }
      .download-card .download-card-body>span { display: block; }
+
+     h2 {
+         font-weight: bold;
+     }
+
 
 }
 

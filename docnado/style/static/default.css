@@ -104,9 +104,6 @@ body.page-sidebar-closed .page-main {
   padding-top: 42px;
   padding-bottom: 10px; }
 
-.page-md h2, .page-md h3, .page-md h4, .page-md h5, .page-md h6 {
-  font-weight: bold; }
-
 .page-md p {
   text-align: justify; }
   .page-md p.info {
@@ -455,6 +452,9 @@ body.page-sidebar-closed .page-main {
 
 .page-md .download-card .download-card-body > span {
   display: block; }
+
+.page-md h2 {
+  font-weight: bold; }
 
 /** PRINT CSS */
 @media print {
