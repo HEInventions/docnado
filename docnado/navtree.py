@@ -3,8 +3,8 @@
 python -m doctest .\navtree.py
 """
 
-import os
 import re
+
 
 def parse_nav_string(nav):
     """ Parse a nav string and pull out the `name` and `weight` of each nav item.
@@ -83,7 +83,6 @@ class NavItem:
         >>> nc in a.children
         True
         """
-        existing_children = []
         for c in self.children:
             if c.name == node.name:
                 if c.weight == 0:
@@ -131,6 +130,6 @@ class NavItem:
         """ Print out the data of this objcect to the console in a nicely formatted
         output. Intended for debugging only.
         """
-        print('  '*level, self.name, self.weight)
+        print('  ' * level, self.name, self.weight)
         for c in self.children:
             c.debug(level + 1)
