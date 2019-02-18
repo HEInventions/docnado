@@ -611,7 +611,7 @@ def generate_static_html(app, root_dir, output_dir):
 
         # Rewrite all relative links to other `.md` files to `.html.`
         output = ''
-        with open(markdown_file, 'r') as f:
+        with open(markdown_file, 'r', encoding="utf-8") as f:
             html = f.read()
 
             def _href_replace(m):
@@ -623,7 +623,7 @@ def generate_static_html(app, root_dir, output_dir):
             output = re.sub('href="(.*md)"', _href_replace, html)
 
         # Rename the file from `.md` to HTML.
-        with open(markdown_file[:-3] + '.html', 'w') as f:
+        with open(markdown_file[:-3] + '.html', 'w', encoding="utf-8") as f:
             f.write(output)
 
         # Delete the Markdown file.
@@ -733,7 +733,7 @@ def has_nav(markdown_text):
     """ Returns True if the passed string of text contains navbar metadata.
         Returns False if it does not.
     """
-    expression = re.compile('(?=\n|)nav:\s+\w+(?=\n |)')
+    expression = re.compile(r'(?=\n|)nav:\s+\w+(?=\n |)')
     return True if expression.search(markdown_text) else False
 
 
@@ -835,7 +835,7 @@ class DocumentLinks:
             request = requests.head(address)
             return request.status_code, address
 
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             return False, address
 
     def detect_broken_links(self, process_pool):
@@ -1083,10 +1083,8 @@ def main():
         def gen_pdfs():
             time.sleep(2)
             generate_static_pdf(
-                    app,
-                    dir_documents,
-                    os.path.join(os.getcwd(), args.pdf_output_dir)
-                    )
+                app, dir_documents, os.path.join(os.getcwd(), args.pdf_output_dir)
+            )
             time.sleep(5)
             os.kill(os.getpid(), signal.SIGTERM)
 
@@ -1110,7 +1108,7 @@ def main():
                 </html>"""
             with open(os.path.join(os.getcwd(), args.html_output_dir, 'index.html'), 'w') as f:
                 f.write(index_html)
-        except Exception as err:
+        except Exception:
             traceback.print_exc(file=sys.stderr)
             sys.exit(-1)
         sys.exit()
@@ -1129,7 +1127,7 @@ def main():
         try:
             print('Attempting set sevelopment server listen on public IP address: ' + args.set_host)
             print('WARNING: The Docnado development environment is intended to be used as a development tool ONLY, '
-                  + 'and is not recommended for use in a production environment.')
+                  'and is not recommended for use in a production environment.')
             app.run(debug=flask_debug, port=PORT_NUMBER, extra_files=dn_watch_files, host=args.set_host)
         except OSError as e:
             print(e)
