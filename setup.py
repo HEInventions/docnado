@@ -1,4 +1,3 @@
-from os import environ
 from setuptools import setup, find_packages
 
 
@@ -9,7 +8,7 @@ test_requirements = ['tox', 'pytest', 'pytest-testdox', 'pytest-testdirectory', 
 
 setup(
     name='docnado',
-    version='1.0.5',
+    version='1.0.6',
     author='Hardy & Ellis Inventions LTD',
     author_email='support@heinventions.com',
 
