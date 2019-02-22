@@ -1025,6 +1025,7 @@ def main():
     if args.find_orphans:
         # Find all the assets in the directory/subdirectories recursively and append their file path to a list.
         files = glob.glob((dir_documents + '/**/*.*'), recursive=True)
+        files = [f for f in files if not os.path.isdir(f)]
         orphans = find_orphans(files)
         if orphans:
             print(f'{len(orphans)} Unused assets (orphans):\n\t' + '\n\t'.join(orphans))
