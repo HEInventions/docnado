@@ -16,11 +16,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap-4.0.0.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome-4.7.0.min.css') }}">
 
+
     <link rel="stylesheet" href="{{ url_for('static', filename='default.css') }}">
 
+    {% for rule in inject[0].split(',') %}
+      <link rel="stylesheet" href="{{ url_for('static', filename=rule.strip()) }}">
+    {% endfor %}
     {% block head %}
     {% endblock %}
-
 </head>
     <body>
 
