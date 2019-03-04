@@ -36,7 +36,7 @@ from watchdog.events import PatternMatchingEventHandler
 import timeago
 from xml.etree import ElementTree
 from flask import Flask, url_for, abort, send_from_directory, \
-    render_template, Markup, make_response
+    render_template, Markup, make_response, render_template_string
 
 import markdown
 import markdown.util
@@ -240,10 +240,39 @@ class MultiPurposeLinkPattern(LinkPattern):
         """ Load the HTML document specified in the link, parse it to HTML elements and return it.
         """
         src, parts = self.get_src(m)
+
         # Find the path to the HTML document, relative to the current markdown page.
         file_path = os.path.join(self.markdown.page_root, src)
         raw_html_string = read_html_for_injection(file_path)
-        return ElementTree.fromstring(raw_html_string)
+
+        # Helper function.
+        def _argify(args):
+            if not '=' in args:
+                raise ValueError('injection template requires named arguments split by ||')
+            left, right = args.split('=')
+            return left.strip(), right.strip()
+
+        # Split arg string on double pipe. Joins them to undo automattic splitting from the markdown.
+        arg_strings = " ".join(parts[1:]).strip('\"').split("||")
+
+        # Parse into dictionary of key-value pairs based on the '=' notation.
+        try:
+            named_args = dict([_argify(args) for args in arg_strings])
+        except Exception as e:
+            raise Exception(f"Error parsing ![INJECT] arguments in {self.markdown.page_file} {repr(e)}")
+
+        # Take the template renderer and give it our string, and named args.
+        # Capture the output as a string.
+        try:
+            injectable_templated_str = render_template_string(raw_html_string, **named_args)
+        except Exception as e:
+            raise Exception(f"Error rendering ![INJECT] template for file {file_path} {repr(e)}")
+
+        # Feed that string to the XML parser.
+        try:
+            return ElementTree.fromstring(injectable_templated_str)
+        except Exception as e:
+            raise Exception(f"Error parsing ![INJECT] template for file {file_path} {repr(e)}")
 
     def handleMatch(self, m):
         """ Use the URL extension to render the link. """
@@ -370,6 +399,7 @@ def build_meta_cache(root):
         with open(path, 'r', encoding='utf-8') as f:
             md = markdown.Markdown(extensions=mdextensions)
             md.page_root = os.path.dirname(path)
+            md.page_file = path
             Markup(md.convert(f.read()))
             return md.Meta if hasattr(md, 'Meta') else None
 
@@ -442,6 +472,7 @@ def _render_markdown(file_path, **kwargs):
     with open(file_path, 'r', encoding='utf-8') as f:
         md = markdown.Markdown(extensions=mdextensions)
         md.page_root = os.path.dirname(file_path)
+        md.page_file = file_path
         markup = Markup(md.convert(f.read()))
 
         # Fetch the template defined in the metadata.
@@ -739,6 +770,7 @@ def find_references(document_path):
     md = markdown.Markdown(extensions=mdextensions)
     document_dir = os.path.dirname(document_path)
     md.page_root = document_dir
+    md.page_file = document_path
 
     # Interpret with the BeautifulSoup HTML scraping library.
     soup = BeautifulSoup(md.convert(markdown_raw_data), 'html.parser')
@@ -819,6 +851,7 @@ class DocumentLinks:
             markdown_raw_data = f.read()
         md = markdown.Markdown(extensions=mdextensions)
         md.page_root = self.md_dir
+        md.page_file = md_file
         html = md.convert(markdown_raw_data)
 
         # Interpret with the BeautifulSoup HTML scraping library.
