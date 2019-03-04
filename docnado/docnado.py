@@ -239,18 +239,11 @@ class MultiPurposeLinkPattern(LinkPattern):
     def as_raw(self, m):
         """ Load the HTML document specified in the link, parse it to HTML elements and return it.
         """
-        _, parts = self.get_src(m)
+        src, parts = self.get_src(m)
         # Find the path to the HTML document, relative to the current markdown page.
-        file_path = os.path.join(self.markdown.page_root, parts[0])
-        if os.path.exists(file_path):
-            html = ""
-            with open(file_path) as file:
-                html = file.read()
-            test = ElementTree.fromstring(html)
-            return test
-        else:
-            # If the document doesn't exist raise an exception.
-            raise Exception(f'Error file {file_path} not found.')
+        file_path = os.path.join(self.markdown.page_root, src)
+        raw_html_string = read_html_for_injection(file_path)
+        return ElementTree.fromstring(raw_html_string)
 
     def handleMatch(self, m):
         """ Use the URL extension to render the link. """
@@ -431,6 +424,16 @@ def build_reload_files_list(extra_dirs):
     return extra_files
 
 
+def read_html_for_injection(path):
+    """ Open an HTML file at the given path and return the contents
+    as a string.  If the file does not exist, we raise an exception.
+    """
+    # TODO: In the future, consider adding some caching here.  However,
+    # beware of reloading / refereshing the page UX implications.
+    with open(path) as file:
+        return file.read()
+
+
 def _render_markdown(file_path, **kwargs):
     """ Given a `file_path` render the Markdown and return the result of `render_template`.
     """
@@ -448,29 +451,18 @@ def _render_markdown(file_path, **kwargs):
             raise Exception('no template found for document')
         template = f'{template}.html'
 
-        # Populate injectable scripts.
-        scripts = md.Meta.get('inject', None)
-        injectables = {}
-        if scripts:
-            for script in scripts:
-                script_path = os.path.join(
-                    os.path.dirname(os.path.abspath(file_path)),
-                    script,
-                )
-                if os.path.exists(script_path):
-                    with open(script_path, 'r') as file:
-                        script_data = file.read()
-                        injectables[script] = script_data
+        # Load any HTML to be injected from the meta-data.
+        injections = md.Meta.get('inject', [])
+        injections = [os.path.join(md.page_root, file) for file in injections]
+        injections = [read_html_for_injection(file) for file in injections]
 
-                else:
-                    raise ValueError(f'{script} DOES NOT exist at expected path: {script_path}')
-
+        # Render it out with all the prepared data.
         return render_template(template,
                                content=markup,
                                nav_menu=NAV_MENU,
                                project_logo=PROJECT_LOGO,
                                pdf_enabled=PDF_GENERATION_ENABLED,
-                               injectables=injectables,
+                               injections=injections,
                                **md.Meta,
                                **kwargs)
 
