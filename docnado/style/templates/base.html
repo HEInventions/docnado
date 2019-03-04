@@ -112,6 +112,9 @@
         <!-- MAIN PAGE CONTENT -->
         <section class="page-main">
             <div class="page-content">
+                {% for key, value in injectables.items() %}
+                      {{value|safe}}
+                {% endfor %}
                 {% block content %}
                 {% endblock %}
             </div>

@@ -230,11 +230,33 @@ class MultiPurposeLinkPattern(LinkPattern):
         alt = m.group(2)
         return alt.lower() == 'download'
 
+    @staticmethod
+    def _is_inject(m):
+        """ Determine if the ALT text [] part of the link says 'INJECT'. """
+        alt = m.group(2)
+        return alt.lower() == 'inject'
+
+    def as_raw(self, m):
+        """ Return raw html """
+        _, parts = self.get_src(m)
+        file_path = os.path.join(self.markdown.page_root, parts[0])
+        if os.path.exists(file_path):
+            html = ""
+            with open(file_path) as file:
+                html = file.read()
+            test = ElementTree.fromstring(html)
+            return test
+        else:
+            raise Exception(f'Error file {file_path} not found.')
+
     def handleMatch(self, m):
         """ Use the URL extension to render the link. """
         src, parts = self.get_src(m)
         if self._is_download(m):
             return self.as_download(m)
+
+        elif self._is_inject(m):
+            return self.as_raw(m)
 
         youtube = self.youtube_url_validation(src)
         if youtube:
@@ -422,11 +444,30 @@ def _render_markdown(file_path, **kwargs):
         if not template:
             raise Exception('no template found for document')
         template = f'{template}.html'
+
+        # Populate injectable scripts.
+        scripts = md.Meta.get('inject', None)
+        injectables = {}
+        if scripts:
+            for script in scripts:
+                script_path = os.path.join(
+                    os.path.dirname(os.path.abspath(file_path)),
+                    script,
+                )
+                if os.path.exists(script_path):
+                    with open(script_path, 'r') as file:
+                        script_data = file.read()
+                        injectables[script] = script_data
+
+                else:
+                    raise ValueError(f'{script} DOES NOT exist at expected path: {script_path}')
+
         return render_template(template,
                                content=markup,
                                nav_menu=NAV_MENU,
                                project_logo=PROJECT_LOGO,
                                pdf_enabled=PDF_GENERATION_ENABLED,
+                               injectables=injectables,
                                **md.Meta,
                                **kwargs)
 
