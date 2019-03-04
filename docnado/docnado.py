@@ -237,8 +237,10 @@ class MultiPurposeLinkPattern(LinkPattern):
         return alt.lower() == 'inject'
 
     def as_raw(self, m):
-        """ Return raw html """
+        """ Load the HTML document specified in the link, parse it to HTML elements and return it.
+        """
         _, parts = self.get_src(m)
+        # Find the path to the HTML document, relative to the current markdown page.
         file_path = os.path.join(self.markdown.page_root, parts[0])
         if os.path.exists(file_path):
             html = ""
@@ -247,6 +249,7 @@ class MultiPurposeLinkPattern(LinkPattern):
             test = ElementTree.fromstring(html)
             return test
         else:
+            # If the document doesn't exist raise an exception.
             raise Exception(f'Error file {file_path} not found.')
 
     def handleMatch(self, m):
