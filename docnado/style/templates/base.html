@@ -112,9 +112,6 @@
         <!-- MAIN PAGE CONTENT -->
         <section class="page-main">
             <div class="page-content">
-                {% for html_string in injections %}
-                      {{html_string|safe}}
-                {% endfor %}
                 {% block content %}
                 {% endblock %}
             </div>
