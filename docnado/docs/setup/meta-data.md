@@ -1,7 +1,7 @@
 title:      Meta-Data
 desc:       Quick reference for how to define meta-data in a document.
-date:       2018/07/20
-version:    1.0.0
+date:       2019/03/076
+version:    1.0.1
 template:   document
 nav:        Get Setup>Metadata
 percent:    100
