@@ -40,6 +40,12 @@
 {% block script %}
 <script type="text/javascript">
 
+    // Fix the gravatar icon if the gravatar fails to load.
+    $('.page-header img.avatar').on('error', function(){
+        let avatar = $(this);
+        avatar.attr('src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAACCElEQVRIS+2VO0sDQRSFE/ARX62CFprCThTNc9OkCqaINhLQKqiQ1ohN0CJgZaGFxD+iELG0EX+CoL2FIFFBLOM55mCVNTM7sRD84LJzz9x7dvY1G/qnG8lkMorYjsfjhwyMt6hpuvfgJHOIq1gs9oo4x/iYwTE1zrFG5b0BV7QB8yaM97PZ7Kjkb6hxjjWpVGpdshuJRCIPw2ecPC3JF9awlj2SgpHJZMZwJY+IFUldYS172CvJHlzBLq7gUqkx7GGvUntgcIPVryk1hj3sVWoPDN5xyyaVGpNOp6fYq9SOfD4/iFW38MZGJBlTKpUi7C0WiwOS7OCquXqlxjhdMeFzwndp/YzZ4/SM0Rz4rWavUnsCfser7HH6jgl2oWWs3mjnQq3HWvZIcgNGVRh+4Hjgt1dzTjVVyW7gtlVgyL/PKaLBMeIC4xMGx5pvIOoYv+FYUXsgwlj9GYzu8ZbOS+MbOwPjTcTX/5hjz/OmNc1tdgE9D+xFGm6rFvDWwfQOpuOSjMHiJthLD0lmoCGOVfPfOivJGvbSg16SuoOGazTsKQ0MPeil9GdwaxdR/IRtb0hSYOghryVJ/uDZHCHqSp2hFz2V+oOiW4TxTtUNetFTqT8oeuEno9QZfF5ReDaVdqZcLvfjmbQKhcKwJGdyudwIPWu1Wp+kjoSxuh0e22lP+A3PP0co9AlOca7xK4NYXAAAAABJRU5ErkJggg==');
+    });
+
     $(document).ready(function() {
 
         // // Apply CSS specific to a table in a *parts* heading.

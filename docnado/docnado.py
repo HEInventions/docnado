@@ -36,7 +36,7 @@ from watchdog.events import PatternMatchingEventHandler
 import timeago
 from xml.etree import ElementTree
 from flask import Flask, url_for, abort, send_from_directory, \
-    render_template, Markup, make_response
+    render_template, Markup, make_response, request
 
 import markdown
 import markdown.util
@@ -76,7 +76,6 @@ class MultiPurposeLinkPattern(LinkPattern):
             if src[0] == "<" and src[-1] == ">":
                 src = src[1:-1]
             return self.sanitize_url(self.unescape(src)), src_parts
-
         else:
             return '', src_parts
 
@@ -469,6 +468,12 @@ def configure_flask(app, root_dir):
         return timeago.format(dt, datetime.datetime.utcnow())
 
     @app.template_filter()
+    def safe_css_id(str):
+        """ Convert a string into a valid HTML ID. """
+        str = str.lower()
+        return re.sub(r'\W+', '_', str)
+
+    @app.template_filter()
     def url_unquote(url):
         """ Removes encoding around a URL. """
         return urllib.parse.unquote(url)
@@ -494,6 +499,75 @@ def configure_flask(app, root_dir):
     def page_not_found(e):
         global NAV_MENU, PROJECT_LOGO
         return render_template('404.html', nav_menu=NAV_MENU, project_logo=PROJECT_LOGO), 404
+
+    @app.route('/book/', methods=['GET', 'POST'])
+    def book():
+        """ Generate a book based on a book/report definintion passed in a
+        a JSON block with the request.
+
+        Usage:
+            > curl -i -H "Content-Type: application/json" -X POST -d '{"pages":['documents/code.md', 'tooling/command_line.md']}' http://localhost:5000/book
+            > http://localhost:5000/book/?page=setup/installation.md&page=setup/meta-data.md#setup_meta_data_md&authors=true&versions=1
+        """
+        global NAV_MENU, PROJECT_LOGO, PDF_GENERATION_ENABLED
+        data_get_pages = request.args.getlist('page')
+        report = None
+
+        # Handle pages as a string.
+        # Usage: /book/?page=a.mb&page=b.md
+        if data_get_pages:
+            report = {'pages': data_get_pages}
+
+        # Handle POST data.
+        elif request.json and 'pages' in request.json:
+            print("GOT POST DATA WITH PAGES FLAG")
+            report = request.json
+
+        # If we have an invalid report.
+        if not report:
+            print('Error: unable to generate a book without specifying the pages.')
+            abort(400)
+            return
+
+        sections = []
+
+        # For each page, compute the markdown.
+        for page in report['pages']:
+
+            # Get the markdown file raw.
+            file_path = os.path.abspath(os.path.join(root_dir, page))
+            if not os.path.isfile(file_path):
+                abort(404)
+
+            # Only accept pages.
+            if '.md' not in [ext.lower() for ext in os.path.splitext(file_path)]:
+                raise Exception('Error: cannot make a book from non-markdown pages.')
+
+            # Load and render the markdown.
+            with open(file_path, 'r', encoding='utf-8') as f:
+                md = markdown.Markdown(extensions=mdextensions)
+                md.page_root = os.path.dirname(file_path)
+                md.page_file = file_path
+                markup = Markup(md.convert(f.read()))
+
+                # Note the article.
+                sections.append({
+                    'page': page,
+                    'content': markup,
+                    'meta': md.Meta
+                })
+
+        # Render the template with the arguments prepared.
+        return render_template('book.html',
+                               report=report,
+                               sections=sections,
+                               nav_menu=NAV_MENU,
+                               project_logo=PROJECT_LOGO,
+                               pdf_enabled=PDF_GENERATION_ENABLED,
+                               authors=request.args.get('authors', None),
+                               versions=request.args.get('versions', None),
+                               dates=request.args.get('dates', None)
+                               )
 
     @app.route("/w/<path:page>")
     def wiki(page):
