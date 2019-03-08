@@ -24,6 +24,7 @@
 </head>
     <body>
 
+        {% block headerbar %}
         <!-- Header Bar -->
         <header class="navbar navbar-light page-headbar">
             <button class="navbar-toggler page-togglesidebar" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +43,9 @@
                 {% endif %}
             </nav>
         </header>
+        {% endblock %}
 
+        {% block sidebar %}
         <!-- Side Bar -->
         <aside class="page-sidebar">
 
@@ -108,6 +111,7 @@
             {% block sidebar_foot %}
             {% endblock %}
         </aside>
+        {% endblock %}
 
         <!-- MAIN PAGE CONTENT -->
         <section class="page-main">
