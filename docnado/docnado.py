@@ -10,7 +10,6 @@ import sys
 import csv
 import glob
 import time
-import json
 import signal
 import shutil
 import urllib
@@ -77,7 +76,6 @@ class MultiPurposeLinkPattern(LinkPattern):
             if src[0] == "<" and src[-1] == ">":
                 src = src[1:-1]
             return self.sanitize_url(self.unescape(src)), src_parts
-
         else:
             return '', src_parts
 
@@ -509,9 +507,9 @@ def configure_flask(app, root_dir):
 
         Usage:
             > curl -i -H "Content-Type: application/json" -X POST -d '{"pages":['documents/code.md', 'tooling/command_line.md']}' http://localhost:5000/book
+            > http://localhost:5000/book/?page=setup/installation.md&page=setup/meta-data.md#setup_meta_data_md&authors=true&versions=1
         """
         global NAV_MENU, PROJECT_LOGO, PDF_GENERATION_ENABLED
-
         data_get_pages = request.args.getlist('page')
         report = None
 
@@ -545,58 +543,31 @@ def configure_flask(app, root_dir):
             if '.md' not in [ext.lower() for ext in os.path.splitext(file_path)]:
                 raise Exception('Error: cannot make a book from non-markdown pages.')
 
-            #global NAV_MENU, PROJECT_LOGO, PDF_GENERATION_ENABLED
-            default_template = 'document'
+            # Load and render the markdown.
             with open(file_path, 'r', encoding='utf-8') as f:
                 md = markdown.Markdown(extensions=mdextensions)
                 md.page_root = os.path.dirname(file_path)
                 md.page_file = file_path
                 markup = Markup(md.convert(f.read()))
 
-                # Fetch the template defined in the metadata.
-                template = md.Meta.get('template', None)
-                template = template[0] if template else default_template
-                if not template:
-                    raise Exception('no template found for document')
-                template = f'{template}.html'
-
+                # Note the article.
                 sections.append({
                     'page': page,
                     'content': markup,
                     'meta': md.Meta
                 })
 
-            #return render_template(template,
-            #                           content=markup,
-            #                           nav_menu=NAV_MENU,
-            #                           project_logo=PROJECT_LOGO,
-            #                           pdf_enabled=PDF_GENERATION_ENABLED,
-            #                           **md.Meta,
-            #                           **kwargs)
-
-        # Render a template that *just* contains the book with no nav.
-        #transformed = {}
-        #for page in report['pages']:
-        #    transformed[page] = wiki(page)
-
-        #report['transformed_pages'] = { page, html for }
-
+        # Render the template with the arguments prepared.
         return render_template('book.html',
                                report=report,
                                sections=sections,
                                nav_menu=NAV_MENU,
                                project_logo=PROJECT_LOGO,
                                pdf_enabled=PDF_GENERATION_ENABLED,
-                               #**md.Meta,
-                               #**kwargs
                                authors=request.args.get('authors', None),
                                versions=request.args.get('versions', None),
-                               dates=request.args.get('dates', None),
+                               dates=request.args.get('dates', None)
                                )
-
-        print(report)
-        #return "test"
-        return json.dumps(report)
 
     @app.route("/w/<path:page>")
     def wiki(page):
