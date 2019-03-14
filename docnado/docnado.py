@@ -245,9 +245,12 @@ class MultiPurposeLinkPattern(LinkPattern):
         file_path = os.path.join(self.markdown.page_root, src)
         raw_html_string = read_html_for_injection(file_path)
 
+        if len(parts) < 2:
+            parts.append("nothing_one=1||nothing_two=2")
+
         # Helper function.
         def _argify(args):
-            if not '=' in args:
+            if '=' not in args:
                 raise ValueError('injection template requires named arguments split by ||')
             left, right = args.split('=')
             return left.strip(), right.strip()
@@ -393,7 +396,7 @@ def build_meta_cache(root):
     from metadata in the Markdown.
     :param root: str: The path to search for files from.
     """
-    doc_files = glob.iglob(root + '/**/*.md', recursive=True)
+    doc_files = glob.iglob(root + '/**/i*.md', recursive=True)
 
     def _meta(path):
         with open(path, 'r', encoding='utf-8') as f:
