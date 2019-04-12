@@ -1,0 +1,9 @@
+<span>
+  {%if label%}
+    <label>{{label|safe}}</label>
+  {% endif %}
+  <textarea class="form-control" rows="{{form_rows|safe}}" {%if placeholder %} placeholder="{{placeholder|safe}}"{% endif %}></textarea>
+</span>
+
+<!-- USAGE: -->
+<!-- ![INJECT](textbox.css.html "rows=10||placeholder=write your thing here") -->
