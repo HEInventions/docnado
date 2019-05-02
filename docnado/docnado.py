@@ -532,8 +532,14 @@ def configure_flask(app, root_dir):
         :param str dt Input date string in the format %Y/%m/%d
         http://flask.pocoo.org/snippets/33/
         """
-        dt = datetime.datetime.strptime(dt, '%Y/%m/%d')
-        return timeago.format(dt, datetime.datetime.utcnow())
+        try:
+            dt = datetime.datetime.strptime(dt, '%Y/%m/%d')
+            return_value = timeago.format(dt, datetime.datetime.utcnow())
+            return return_value
+        except:
+            print('ERROR: Could not parse date string.')
+            sys.exit(-1)
+
 
     @app.template_filter()
     def url_unquote(url):
@@ -650,7 +656,9 @@ def generate_static_html(app, root_dir, output_dir):
     """ Generate a static HTML site for the documentation in `root_dir`
     into `output_dir`.
     """
-    from flask_frozen import Freezer
+    from flask_frozen import Freezer, MissingURLGeneratorWarning
+    import warnings
+    warnings.filterwarnings("ignore", category=MissingURLGeneratorWarning)
 
     # Update the flask config.
     app.config['FREEZER_RELATIVE_URLS'] = True
