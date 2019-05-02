@@ -110,3 +110,4 @@ wkhtmltopdf_0.12.5.exe
 
 # Vim tempfiles
 .*.swp
+.vscode/
