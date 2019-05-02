@@ -431,7 +431,10 @@ def build_nav_menu(meta_cache):
     This uses the `nav: Assembly>Bench>Part` variable at the top of the Markdown file.
     """
     root = NavItem('root', 0)
-    for path, meta in meta_cache.items():
+    # Pre-sort the nav-items alphabetically by nav-string. This will get overridden with the arange()
+    # function, but this avoids-un arranged items moving round between page refreshes due to Dicts being 
+    # unordered.
+    for path, meta in sorted(meta_cache.items(), key = lambda i: i[1].get('nav', [''])[0]):
         nav_str = meta.get('nav', [None])[0]
         nav_chunks = parse_nav_string(nav_str)
         node = root
