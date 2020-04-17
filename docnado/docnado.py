@@ -45,8 +45,6 @@ from markdown.postprocessors import Postprocessor
 from markdown.inlinepatterns import LinkPattern, IMAGE_LINK_RE, dequote, handleAttributes
 from markdown.blockprocessors import HashHeaderProcessor
 
-from urllib.parse import quote
-
 from http.client import responses
 
 if __package__:
@@ -408,7 +406,7 @@ def build_meta_cache(root):
             return md.Meta if hasattr(md, 'Meta') else None
 
     doc_files_meta = {os.path.relpath(path, start=root): _meta(path) for path in doc_files}
-    doc_files_meta = {quote(path): value for path, value in doc_files_meta.items() if value is not None}
+    doc_files_meta = {path: value for path, value in doc_files_meta.items() if value is not None}
 
     # If a nav filter is set, exclude relevant documents.
     # This takes the comma separated string supplied to `nav_limit`
