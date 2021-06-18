@@ -16,7 +16,7 @@
             {% for email in authors %}
             <img src="{{ email | gravatar }}" class="avatar" alt="{{ email }}" title="{{ email }}" />
             {% endfor %}
-            <small>last updated <span>{{ date | first | timesince }}</span> on <span>{{ date | first }}</span></small>
+            <small>last updated on <span>{{ date | first }}</span></small>
         </p>
 
         {% if percent and percent != ['100'] %}
