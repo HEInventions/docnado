@@ -1,6 +1,5 @@
 Flask==1.1.2
 Markdown==2.6.11
-timeago==1.0.8
 Frozen-Flask==0.15
 beautifulsoup4==4.9.0
 requests==2.23.0

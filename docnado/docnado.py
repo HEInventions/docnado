@@ -33,7 +33,6 @@ from urllib.parse import urlparse
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
-import timeago
 from xml.etree import ElementTree
 from flask import Flask, url_for, abort, send_from_directory, \
     render_template, Markup, make_response, render_template_string
@@ -534,20 +533,6 @@ def configure_flask(app, root_dir):
         email = email.strip().lower().encode('utf-8')
         hash_email = hashlib.md5(email).hexdigest()
         return f'{url}{hash_email}?s={size}&r={rating}&d={default}'
-
-    @app.template_filter()
-    def timesince(dt, past_="ago", future_="from now", default="just now"):
-        """ Returns string representing "time since" e.g. 3 days ago, 5 hours ago etc.
-        :param str dt Input date string in the format %Y/%m/%d
-        http://flask.pocoo.org/snippets/33/
-        """
-        try:
-            dt = datetime.datetime.strptime(dt, '%Y/%m/%d')
-            return_value = timeago.format(dt, datetime.datetime.utcnow())
-            return return_value
-        except:
-            print('ERROR: Could not parse date string.')
-            sys.exit(-1)
 
 
     @app.template_filter()

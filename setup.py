@@ -8,7 +8,7 @@ test_requirements = ['tox', 'pytest', 'pytest-testdox', 'pytest-testdirectory', 
 
 setup(
     name='docnado',
-    version='1.0.10',
+    version='1.0.11',
     author='Hardy & Ellis Inventions LTD',
     author_email='support@heinventions.com',
 
@@ -28,7 +28,6 @@ setup(
     install_requires=[
         'Flask==1.1.2',
         'Markdown==2.6.11',
-        'timeago==1.0.8',
         'Frozen-Flask==0.15',
         'beautifulsoup4==4.9.0',
         'requests==2.23.0',
