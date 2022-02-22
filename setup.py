@@ -8,7 +8,7 @@ test_requirements = ['tox', 'pytest', 'pytest-testdox', 'pytest-testdirectory', 
 
 setup(
     name='docnado',
-    version='1.0.12',
+    version='1.0.13',
     author='Hardy & Ellis Inventions LTD',
     author_email='support@heinventions.com',
 
