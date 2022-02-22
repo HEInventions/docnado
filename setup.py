@@ -26,12 +26,13 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     install_requires=[
-        'Flask==1.1.2',
+        'Flask==1.1.4',
         'Markdown==2.6.11',
         'Frozen-Flask==0.15',
         'beautifulsoup4==4.9.0',
         'requests==2.23.0',
         'watchdog==0.10.2',
+        'markupsafe==2.0.1',
     ],
     classifiers=(
         "Programming Language :: Python :: 3",
