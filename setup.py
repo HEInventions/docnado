@@ -30,7 +30,7 @@ setup(
         'Markdown==2.6.11',
         'Frozen-Flask==0.15',
         'beautifulsoup4==4.9.0',
-        'requests==2.23.0',
+        'requests==2.31.0',
         'watchdog==0.10.2',
         'markupsafe==2.0.1',
     ],
